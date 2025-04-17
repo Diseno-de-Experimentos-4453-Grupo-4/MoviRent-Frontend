@@ -10,7 +10,7 @@ const visible = ref(false);
 
       <template #start>
         <Button variant="text">
-          <img src="../../assets/logo.svg" alt="Logo" class="w-14 h-14 md:w-18 md:h-18" />
+          <img src="../../assets/logo.svg" alt="Logo" class="w-14 h-14 md:w-15 md:h-15" />
         </Button>
       </template>
 
