@@ -1,10 +1,10 @@
 import api from './api';
 import { ref } from 'vue';
 
-// Estado reactivo global
+
 const authState = ref(null);
 
-// Inicializar con datos de localStorage si existen
+
 const storedUser = localStorage.getItem('auth');
 authState.value = storedUser ? JSON.parse(storedUser) : null;
 
