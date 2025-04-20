@@ -1,0 +1,39 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Antonella Oré",
+      "email": "anto@gmail.com",
+      "password": "Antonella123",
+      "phone": "999-999-999",
+      "dni": "87654321"
+    },
+    {
+      "id": "40df",
+      "name": "mathias",
+      "password": "1234@",
+      "phone": "999999999",
+      "email": "mathias@gmail.com",
+      "dni": "88888888"
+    },
+    {
+      "id": "e298",
+      "name": "adriano",
+      "password": "12345678",
+      "phone": "111111111",
+      "email": "adriano@gmail.com",
+      "dni": "22222222"
+    }
+  ],
+  "scooters": [
+    {
+      "id": 1,
+      "modelo": "Xiaomi Mi Scooter Pro 2",
+      "imagen": "ruta/a/imagen-scooter.jpg",
+      "bateria": 85,
+      "estado": "Disponible",
+      "precio_hora": 3.5,
+      "propietario": "mathias@gmail.com"
+    }
+  ]
+}
