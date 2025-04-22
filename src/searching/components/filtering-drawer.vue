@@ -1,5 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+
+const emit = defineEmits(['filter-applied']);
 
 const visible = ref(false);
 
@@ -10,12 +12,34 @@ const districts = ref([
 ]);
 
 const selectedDistrict = ref();
+const addressFilter = ref('');
+
+const isFilterApplied = computed(() => {
+  return selectedDistrict.value || (addressFilter.value && addressFilter.value.trim() !== '');
+});
+
+const applyFilters = () => {
+  if (isFilterApplied.value) {
+    emit('filter-applied', {
+      district: selectedDistrict.value,
+      address: addressFilter.value
+    });
+    visible.value = false;
+  }
+};
+
+const clearFilters = () => {
+  selectedDistrict.value = null;
+  addressFilter.value = '';
+  emit('filter-applied', { district: null, address: '' });
+}
 </script>
 
 <template>
   <div class="filtering">
-    <Button @click="visible=true" variant="text" icon="pi pi-filter" label="Filtrar"/>
-
+    <div class="button-wrapper flex justify-end">
+      <Button @click="visible=true" variant="text" icon="pi pi-filter" label="Filtrar" class="justify-end"/>
+    </div>
     <Drawer v-model:visible="visible" position="right" class="filter-drawer md:!w-80 lg:!w-[30rem] !w-full">
       <div class="accordion-container">
         <Accordion>
@@ -37,14 +61,25 @@ const selectedDistrict = ref();
             <AccordionHeader class="text-center">Filtrar por dirección</AccordionHeader>
             <AccordionContent>
               <div>
-                <InputText placeholder="Escribe una dirección" class="w-full" />
+                <InputText v-model="addressFilter" placeholder="Escribe una dirección" class="w-full" />
               </div>
             </AccordionContent>
           </AccordionPanel>
         </Accordion>
       </div>
-      <div class="button-container flex justify-center mt-4">
-        <Button label="Aplicar" class="w-full" @click ="visible=false" />
+      <div class="button-container flex justify-between mt-4 gap-2">
+        <Button
+          label="Limpiar"
+          class="w-full"
+          severity="secondary"
+          @click="clearFilters"
+        />
+        <Button
+          label="Aplicar"
+          class="w-full"
+          @click="applyFilters"
+          :disabled="!isFilterApplied"
+        />
       </div>
     </Drawer>
   </div>
