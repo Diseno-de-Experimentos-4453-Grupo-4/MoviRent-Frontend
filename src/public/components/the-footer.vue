@@ -50,10 +50,10 @@ const item_soporte = ref ([
 
 <template>
   <footer class="flex flex-col items-center justify-center p-4 footer ">
-    <div class="flex flex-col items-center grid grid-cols-3 pb-2.5">
+    <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 pb-2.5 gap-4">
       <Menu :model="items_explora" class="col-span-1"/>
-      <Menu :model="items_redes" class="col-span-1 "/>
-      <Menu :model="item_soporte" class="col-span-1"/>
+      <Menu :model="items_redes" class="col-span-1"/>
+      <Menu :model="item_soporte" class="col-span-1 support-menu"/>
     </div>
     <div class="mt-9">
       <p class="text-center ">©Movirent 2025. Todos los derechos reservados.</p>
@@ -66,11 +66,6 @@ const item_soporte = ref ([
   margin-top: auto;
   width: 100%;
   background-color: var(--color-primary)
-}
-
-.grid{
-  gap: 50vh;
-  align-items: start;
 }
 
 :deep(.p-menu) {
@@ -98,5 +93,6 @@ const item_soporte = ref ([
   color: white;
   font-size: 2.5rem;
 }
+
 
 </style>

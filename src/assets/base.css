@@ -16,6 +16,8 @@
 
   --vt-c-indigo: #2c3e50;
 
+  --vt-c-indigo-light: #C9C9DF;
+
   --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
   --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
   --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
@@ -33,6 +35,7 @@
   --color-background-soft: var(--vt-c-white-soft);
   --color-background-mute: var(--vt-c-white-mute);
   --color-primary: var(--vt-c-green-soft);
+  --color-secondary-background: var(--vt-c-indigo-light);
 
   --color-border: var(--vt-c-divider-light-2);
   --color-border-hover: var(--vt-c-divider-light-1);
