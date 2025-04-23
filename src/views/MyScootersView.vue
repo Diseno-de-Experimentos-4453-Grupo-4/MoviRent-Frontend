@@ -31,14 +31,16 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import api from '@/api';
-import auth from '@/auth';
+import { getAuth } from 'firebase/auth';
 
 const userScooters = ref([]);
 const loading = ref(true);
 
 onMounted(async () => {
   try {
-    const user = auth.getCurrentUser();
+    const auth = getAuth();
+    const user = auth.currentUser;
+
     if (user) {
       const response = await api.get(`/scooters?propietario=${user.email}`);
       userScooters.value = response.data;

@@ -1,49 +1,59 @@
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { auth } from './firebase';
 import api from './api';
-import { ref } from 'vue';
-
-
-const authState = ref(null);
-
-
-const storedUser = localStorage.getItem('auth');
-authState.value = storedUser ? JSON.parse(storedUser) : null;
 
 export default {
   async login(email, password) {
     try {
-      const response = await api.get(`/users?email=${email}&password=${password}`);
-      if (response.data.length === 0) throw new Error('Credenciales incorrectas');
-
-      const user = response.data[0];
-      localStorage.setItem('auth', JSON.stringify(user));
-      authState.value = user;
-      return user;
+      await signInWithEmailAndPassword(auth, email, password);
+      return auth.currentUser;
     } catch (error) {
-      throw error;
+      throw new Error('Credenciales incorrectas. Por favor, inténtalo de nuevo.');
     }
   },
 
-  async register(userData) {
+  async register({ email, password, name, phone, dni }) {
     try {
-      const emailCheck = await api.get(`/users?email=${userData.email}`);
-      if (emailCheck.data.length > 0) throw new Error('El correo ya está registrado');
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-      const response = await api.post('/users', userData);
-      localStorage.setItem('auth', JSON.stringify(response.data));
-      authState.value = response.data;
-      return response.data;
+      await updateProfile(userCredential.user, {
+        displayName: name
+      });
+
+      await api.post('/usuarios', {
+        email,
+        nombre: name,
+        telefono: phone,
+        dni
+      });
+
+      return userCredential.user;
     } catch (error) {
-      throw error;
+      console.error('Error durante el registro:', error);
+      if (error.code === 'auth/email-already-in-use') {
+        throw new Error('Este correo ya está registrado. Por favor, utiliza otro correo.');
+      } else if (error.code === 'auth/weak-password') {
+        throw new Error('La contraseña es demasiado débil. Usa al menos 6 caracteres.');
+      } else {
+        throw new Error('Error en el registro. Por favor, inténtalo de nuevo.');
+      }
     }
   },
 
-  logout() {
-    localStorage.removeItem('auth');
-    authState.value = null;
-    setTimeout(() => window.location.reload(), 100);
+  async logout() {
+    await signOut(auth);
   },
 
   getCurrentUser() {
-    return authState.value;
+    return new Promise((resolve, reject) => {
+      const unsubscribe = onAuthStateChanged(auth, user => {
+        unsubscribe();
+        resolve(user);
+      }, reject);
+    });
+  },
+
+  isAuthenticated() {
+    return auth.currentUser !== null;
   }
 };

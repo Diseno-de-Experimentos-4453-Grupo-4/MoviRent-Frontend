@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import ScooterSearchingView from '@/searching/views/scooter-searching-view.vue';
 import LoginView from '@/views/LoginView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import HomeView from '@/views/HomeView.vue';
@@ -30,6 +32,18 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/buscar',
+    name: 'search',
+    component: ScooterSearchingView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/scooter/:id',
+    name: 'scooter-details',
+    component: () => import('@/searching/views/scooter-details-view.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/'
   }
@@ -40,12 +54,25 @@ const router = createRouter({
   routes
 });
 
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = auth.getCurrentUser() !== null;
+router.beforeEach(async (to, from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
+  const auth = getAuth();
 
-  if (to.meta.requiresAuth && !isAuthenticated) {
+  if (!auth.currentUser) {
+    await new Promise((resolve) => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        unsubscribe();
+        resolve(user);
+      });
+    });
+  }
+
+  const isAuthenticated = auth.currentUser !== null;
+
+  if (requiresAuth && !isAuthenticated) {
     next('/login');
-  } else if (to.meta.requiresGuest && isAuthenticated) {
+  } else if (requiresGuest && isAuthenticated) {
     next('/');
   } else {
     next();

@@ -22,7 +22,9 @@
       <label>DNI</label>
       <input type="text" placeholder="Ingresa tu DNI" v-model="userData.dni">
     </div>
-    <button class="register-button" @click="handleRegister">Registrarse</button>
+    <button class="register-button" @click="handleRegister" :disabled="isRegistering">
+      {{ isRegistering ? 'Registrando...' : 'Registrarse' }}
+    </button>
     <p class="login-prompt">
       ¿Ya tienes una cuenta? <router-link to="/login">Inicia Sesión</router-link>
     </p>
@@ -36,6 +38,7 @@ import auth from '@/auth';
 
 const router = useRouter();
 const error = ref('');
+const isRegistering = ref(false);
 const userData = ref({
   name: '',
   password: '',
@@ -44,12 +47,43 @@ const userData = ref({
   dni: ''
 });
 
+const validateForm = () => {
+  if (!userData.value.name.trim()) {
+    error.value = 'El nombre es obligatorio';
+    return false;
+  }
+
+  if (!userData.value.email.trim()) {
+    error.value = 'El correo electrónico es obligatorio';
+    return false;
+  }
+
+  if (!userData.value.password.trim() || userData.value.password.length < 6) {
+    error.value = 'La contraseña debe tener al menos 6 caracteres';
+    return false;
+  }
+
+  if (!userData.value.dni.trim()) {
+    error.value = 'El DNI es obligatorio';
+    return false;
+  }
+
+  return true;
+};
+
 const handleRegister = async () => {
+  if (!validateForm()) return;
+
+  error.value = '';
+  isRegistering.value = true;
+
   try {
     await auth.register(userData.value);
     router.push('/');
   } catch (err) {
     error.value = err.message;
+  } finally {
+    isRegistering.value = false;
   }
 };
 </script>
@@ -99,6 +133,10 @@ h1 {
   font-weight: bold;
   cursor: pointer;
   margin-top: 1rem;
+}
+.register-button:disabled {
+  background-color: #7db1e8;
+  cursor: not-allowed;
 }
 .login-prompt {
   text-align: center;

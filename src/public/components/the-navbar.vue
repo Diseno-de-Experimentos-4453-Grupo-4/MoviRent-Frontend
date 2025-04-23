@@ -1,20 +1,29 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import auth from '@/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const router = useRouter();
 const visible = ref(false);
-const currentUser = computed(() => auth.getCurrentUser());
+const currentUser = ref(null);
+let unsubscribe = null;
 
-const handleLogout = () => {
-  auth.logout();
+const handleLogout = async () => {
+  await auth.logout();
   router.push('/login');
 };
 
 onMounted(() => {
-  if (!currentUser.value && localStorage.getItem('auth')) {
-    auth.getCurrentUser();
+  const auth = getAuth();
+  unsubscribe = onAuthStateChanged(auth, (user) => {
+    currentUser.value = user;
+  });
+});
+
+onUnmounted(() => {
+  if (unsubscribe) {
+    unsubscribe();
   }
 });
 </script>

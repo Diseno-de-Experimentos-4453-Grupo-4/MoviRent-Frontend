@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue';
+import api from '@/api';
 
 const props = defineProps({
   filters: {
@@ -9,69 +10,79 @@ const props = defineProps({
       address: ''
     })
   }
-})
+});
 
-const scooters = ref([])
-const layout = ref('grid')
-const loading = ref(false)
+const scooters = ref([]);
+const layout = ref('grid');
+const loading = ref(false);
+const initialized = ref(false);
 
-const loadScooters = () => {
-  loading.value = true
-  setTimeout(() => {
-    scooters.value = [
-      { id: 1, image: 'https://picsum.photos/800/800', district: 'Distrito 1', address: 'Av. Principal 123' },
-      { id: 2, image: 'https://picsum.photos/800/800', district: 'Distrito 2', address: 'Calle Los Olivos 456' },
-      { id: 3, image: 'https://picsum.photos/800/800', district: 'Distrito 3', address: 'Jr. Las Flores 789' },
-      { id: 4, image: 'https://picsum.photos/800/800', district: 'Distrito 1', address: 'Av. Central 234' },
-      { id: 5, image: 'https://picsum.photos/800/800', district: 'Distrito 2', address: 'Calle Los Pinos 567' },
-      { id: 6, image: 'https://picsum.photos/800/800', district: 'Distrito 3', address: 'Jr. Las Palmeras 890' },
-      { id: 7, image: 'https://picsum.photos/800/800', district: 'Distrito 1', address: 'Av. Libertadores 345' },
-      { id: 8, image: 'https://picsum.photos/800/800', district: 'Distrito 2', address: 'Calle Los Cedros 678' },
-      { id: 9, image: 'https://picsum.photos/800/800', district: 'Distrito 3', address: 'Jr. Las Orquídeas 901' },
-      { id: 10, image: 'https://picsum.photos/800/800', district: 'Distrito 1', address: 'Av. Industrial 456' },
-      { id: 11, image: 'https://picsum.photos/800/800', district: 'Distrito 2', address: 'Calle Los Nogales 789' },
-      { id: 12, image: 'https://picsum.photos/800/800', district: 'Distrito 3', address: 'Jr. Las Violetas 012' },
-      { id: 13, image: 'https://picsum.photos/800/800', district: 'Distrito 1', address: 'Av. Comercial 567' },
-      { id: 14, image: 'https://picsum.photos/800/800', district: 'Distrito 2', address: 'Calle Los Robles 890' },
-      { id: 15, image: 'https://picsum.photos/800/800', district: 'Distrito 3', address: 'Jr. Las Azucenas 123' }
-    ]
-    loading.value = false
-  }, 500)
-}
+const hasActiveFilters = computed(() => {
+  return (props.filters.district !== null) ||
+         (props.filters.address && props.filters.address.trim() !== '');
+});
 
-const filteredScooters = computed(() => {
-  if (!props.filters.district && !props.filters.address) {
-    return scooters.value
+const fetchScooters = async () => {
+  if (!hasActiveFilters.value) {
+    scooters.value = [];
+    return;
   }
 
-  return scooters.value.filter(scooter => {
-    let matchesDistrict = true
-    let matchesAddress = true
+  loading.value = true;
+  try {
+    let response;
 
     if (props.filters.district) {
-      matchesDistrict = scooter.district === props.filters.district.name
+      response = await api.get(`/api/v1/Scooter/district?district=${encodeURIComponent(props.filters.district.name)}`);
+    } else if (props.filters.address && props.filters.address.trim() !== '') {
+      response = await api.get(`/api/v1/Scooter/address/${encodeURIComponent(props.filters.address)}`);
+    } else {
+      return;
     }
 
-    if (props.filters.address && props.filters.address.trim() !== '') {
-      matchesAddress = scooter.address.toLowerCase().includes(props.filters.address.toLowerCase())
-    }
-
-    return matchesDistrict && matchesAddress
-  })
-})
+    scooters.value = response.data;
+    initialized.value = true;
+  } catch (error) {
+    console.error('Error al cargar los scooters:', error);
+    scooters.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
 
 watch(() => props.filters, () => {
-}, { deep: true })
+  fetchScooters();
+}, { deep: true });
 
 onMounted(() => {
-  loadScooters()
-})
+  initialized.value = false;
+});
 </script>
 
 <template>
   <div class="scooter-view">
+    <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+      <div v-for="n in 9" :key="n" class="card">
+        <div class="card-content items-center">
+          <Skeleton height="300px" width="100%" />
+          <div class="p-4 flex justify-center max-w-70 w-full">
+            <Skeleton height="40px" width="100%" class="mt-2" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else-if="!hasActiveFilters" class="filter-required-message">
+      <div class="flex flex-col items-center justify-center p-8 text-center">
+        <i class="pi pi-filter text-5xl mb-4 text-gray-400"></i>
+        <h2 class="text-2xl font-bold mb-2">Selecciona un filtro para comenzar</h2>
+        <p class="text-gray-600">Utiliza el panel de filtros para buscar scooters por distrito o dirección</p>
+      </div>
+    </div>
+
     <DataView
-      :value="filteredScooters"
+      v-else
+      :value="scooters"
       :layout="layout"
       :paginator="true"
       :rows="9"
@@ -82,7 +93,7 @@ onMounted(() => {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
           <div v-for="scooter in slotProps.items" :key="scooter.id" class="card">
             <div class="card-content items-center">
-              <img :src="scooter.image" alt="Scooter Image" class="w-70 h-120 object-cover" />
+              <img :src="scooter.image || 'https://picsum.photos/800/800'" alt="Scooter Image" class="w-70 h-120 object-cover" />
               <div class="p-4 flex justify-center max-w-70 w-full">
                 <Button
                   label="Ver detalles"
@@ -122,5 +133,13 @@ onMounted(() => {
 
 .card-content {
   border: none;
+}
+
+.filter-required-message {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin: 2rem;
+  padding: 3rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 </style>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const emit = defineEmits(['filter-applied']);
 
@@ -33,6 +33,16 @@ const clearFilters = () => {
   addressFilter.value = '';
   emit('filter-applied', { district: null, address: '' });
 }
+
+onMounted(() => {
+  visible.value = true;
+});
+
+const handleClose = () => {
+  if (isFilterApplied.value) {
+    visible.value = false;
+  }
+};
 </script>
 
 <template>
@@ -40,7 +50,17 @@ const clearFilters = () => {
     <div class="button-wrapper flex justify-end">
       <Button @click="visible=true" variant="text" icon="pi pi-filter" label="Filtrar" class="justify-end"/>
     </div>
-    <Drawer v-model:visible="visible" position="right" class="filter-drawer md:!w-80 lg:!w-[30rem] !w-full">
+    <Drawer
+      v-model:visible="visible"
+      position="right"
+      class="filter-drawer md:!w-80 lg:!w-[30rem] !w-full"
+      :closable="isFilterApplied"
+      @hide="handleClose"
+    >
+      <div class="filter-header mb-4">
+        <h2 class="text-lg font-bold">Selecciona un filtro para comenzar</h2>
+        <p v-if="!isFilterApplied" class="text-red-500 text-sm">Debes seleccionar al menos un filtro para continuar</p>
+      </div>
       <div class="accordion-container">
         <Accordion>
           <AccordionPanel value="0">
@@ -115,5 +135,9 @@ const clearFilters = () => {
 
 .accordion-container :deep(.p-accordion-tab) {
   margin-bottom: 0.5rem;
+}
+
+.filter-header {
+  text-align: center;
 }
 </style>
