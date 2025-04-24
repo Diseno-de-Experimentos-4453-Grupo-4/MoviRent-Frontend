@@ -14,16 +14,16 @@
         class="scooter-card"
       >
         <div class="card-header">
-          <h2>{{ scooter.modelo }}</h2>
+          <h2>{{ scooter.model }}</h2>
         </div>
         <div class="card-content">
-          <p><strong>Estado:</strong> {{ scooter.estado }}</p>
-          <p><strong>Marca:</strong> {{ scooter.marca }}</p>
-          <p v-if="scooter.precio_hora"><strong>Precio/hora:</strong> S/{{ scooter.precio_hora }}</p>
-          <p><strong>Direccion:</strong> {{ scooter.direccion }}</p>
-          <p><strong>Contacto:</strong> {{ scooter.contacto }}</p>
+          <p><strong>Estado:</strong> {{ scooter.state }}</p>
+          <p><strong>Marca:</strong> {{ scooter.brand }}</p>
+          <p v-if="scooter.price"><strong>Precio/hora:</strong> S/{{ scooter.price }}</p>
+          <p><strong>Direccion:</strong> {{ scooter.address }}</p>
+          <p><strong>Contacto:</strong> {{ scooter.phoneNumber }}</p>
         </div>
-        <button class="detail-btn">Ver detalle</button>
+        <button class="detail-btn" @click="viewScooterDetails(scooter)">Ver detalle</button>
       </div>
 
       <div v-if="userScooters.length === 0" class="no-scooters">
@@ -38,15 +38,32 @@ import { ref, onMounted } from 'vue';
 import api from '@/api';
 import { getAuth } from 'firebase/auth';
 import { useRouter } from 'vue-router';
+import { useScooterStore } from '@/stores/scooterStore';
 
 const userScooters = ref([]);
 const loading = ref(true);
 const router = useRouter();
 const error = ref(null);
 const scooters = ref([]);
+const scooterStore = useScooterStore();
 
 const goToAddScooter = () => {
   router.push('/publicar-scooter');
+};
+
+const viewScooterDetails = (scooter) => {
+  const scooterData = {
+    id: scooter.id,
+    model: scooter.modelo,
+    brand: scooter.marca,
+    price: scooter.precio_hora,
+    address: scooter.direccion,
+    isAvailable: scooter.estado === "Disponible"
+  };
+
+  scooterStore.setSelectedScooter(scooterData);
+
+  router.push(`/scooter/${scooter.id}`);
 };
 
 onMounted(async () => {
@@ -64,13 +81,14 @@ onMounted(async () => {
 
         userScooters.value = (scootersResponse.data || []).map(scooter => ({
           id: scooter.id,
-          modelo: scooter.model,
-          marca: scooter.brand,
-          precio_hora: scooter.price,
-          direccion: `${scooter.address}`,
-          estado: scooter.isAvailable ? "Disponible" : "No disponible",
-          contacto: profileResponse.data.phoneNumber || "No especificado"
+          model: scooter.model,
+          brand: scooter.brand,
+          price: scooter.price,
+          address: `${scooter.address}`,
+          state: scooter.isAvailable ? "Disponible" : "No disponible",
+          phoneNumber: profileResponse.data.phoneNumber || "No especificado"
         }));
+        scooterStore.setScooters(userScooters.value);
       } else {
         error.value = "No se encontró información del perfil";
       }

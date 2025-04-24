@@ -1,5 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router';
+import { onMounted, ref } from 'vue'
 
 const props = defineProps({
   scooter: {
@@ -9,10 +10,12 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const hoursToRent = ref(1);
 
 const goBackToSearch = () => {
   router.push('/buscar');
 };
+
 </script>
 
 <template>

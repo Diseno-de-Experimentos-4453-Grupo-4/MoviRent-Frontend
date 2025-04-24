@@ -9,6 +9,10 @@ export const useScooterStore = defineStore('scooter', () => {
     scooters.value = scootersList
   }
 
+  function addScooter(scooter) {
+    scooters.value.push(scooter)
+  }
+
   function getScooterById(id) {
     const numericId = parseInt(id, 10);
     return scooters.value.find(s => s.id === numericId);
