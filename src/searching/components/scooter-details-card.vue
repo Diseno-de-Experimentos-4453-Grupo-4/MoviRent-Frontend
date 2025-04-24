@@ -1,25 +1,17 @@
 <script setup>
-import { defineProps } from 'vue';
+import { useRouter } from 'vue-router';
 
 const props = defineProps({
   scooter: {
     type: Object,
-    required: true,
-    default: () => ({
-      id: null,
-      name: '',
-      brand: '',
-      model: '',
-      pricePerHour: 0,
-      address: '',
-      contact: '',
-      image: ''
-    })
+    required: true
   }
 });
 
-const goBack = () => {
-  window.history.back();
+const router = useRouter();
+
+const goBackToSearch = () => {
+  router.push('/buscar');
 };
 </script>
 
@@ -46,10 +38,6 @@ const goBack = () => {
           <div class="scooter-info flex flex-col  items-center justify-center">
             <div class="info-fields flex-grow gap-8 w-full max-w-md">
               <div class="field mb-3">
-                <label class="font-bold">Nombre:</label>
-                <div>{{ scooter.name }}</div>
-              </div>
-              <div class="field mb-3">
                 <label class="font-bold">Marca:</label>
                 <div>{{ scooter.brand }}</div>
               </div>
@@ -59,21 +47,17 @@ const goBack = () => {
               </div>
               <div class="field mb-3">
                 <label class="font-bold">Precio por hora:</label>
-                <div>S/ {{ scooter.pricePerHour }}</div>
+                <div>S/ {{ scooter.price }}</div>
               </div>
               <div class="field mb-3">
                 <label class="font-bold">Dirección:</label>
                 <div>{{ scooter.address }}</div>
               </div>
-              <div class="field mb-3">
-                <label class="font-bold">Contacto:</label>
-                <div>{{ scooter.contact }}</div>
-              </div>
             </div>
 
             <div class="action-buttons flex gap-2 justify-center mt-4 w-full">
               <Button label="Alquilar" class="p-button-success" />
-              <Button label="Regresar" @click="goBack" class="p-button-secondary" />
+              <Button label="Regresar" @click="goBackToSearch" class="p-button-secondary" />
             </div>
           </div>
         </div>

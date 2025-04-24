@@ -42,6 +42,8 @@ import { useRouter } from 'vue-router';
 const userScooters = ref([]);
 const loading = ref(true);
 const router = useRouter();
+const error = ref(null);
+const scooters = ref([]);
 
 const goToAddScooter = () => {
   router.push('/publicar-scooter');
@@ -49,15 +51,35 @@ const goToAddScooter = () => {
 
 onMounted(async () => {
   try {
-    const auth = getAuth();
-    const user = auth.currentUser;
+    loading.value = true;
+    const firebaseAuth = getAuth();
 
-    if (user) {
-      const response = await api.get(`/scooters?propietario=${user.email}`);
-      userScooters.value = response.data;
+    if (firebaseAuth.currentUser) {
+      const userEmail = firebaseAuth.currentUser.email;
+
+      const profileResponse = await api.get(`Profile/${userEmail}`);
+
+      if (profileResponse.data && profileResponse.data.id) {
+        const scootersResponse = await api.get(`Scooter/profile?profileId=${profileResponse.data.id}`);
+
+        userScooters.value = (scootersResponse.data || []).map(scooter => ({
+          id: scooter.id,
+          modelo: scooter.model,
+          marca: scooter.brand,
+          precio_hora: scooter.price,
+          direccion: `${scooter.address}`,
+          estado: scooter.isAvailable ? "Disponible" : "No disponible",
+          contacto: profileResponse.data.phoneNumber || "No especificado"
+        }));
+      } else {
+        error.value = "No se encontró información del perfil";
+      }
+    } else {
+      error.value = "Usuario no autenticado";
     }
-  } catch (error) {
-    console.error("Error cargando scooters:", error);
+  } catch (err) {
+    console.error("Error cargando scooters:", err);
+    error.value = "Error al cargar los scooters: " + err.message;
   } finally {
     loading.value = false;
   }

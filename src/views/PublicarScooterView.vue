@@ -7,33 +7,47 @@
     <div class="form-container">
       <form @submit.prevent="handleSubmit" class="scooter-form">
         <div class="form-group">
-          <label>Nombre:</label>
-          <input v-model="form.nombre" placeholder="Ej: Scooter 2" required>
-        </div>
-
-        <div class="form-group">
           <label>Marca:</label>
-          <input v-model="form.marca" placeholder="Ej: Genérica" required>
+          <input v-model="form.Brand" placeholder="Ej: Xiaomi" required>
         </div>
 
         <div class="form-group">
           <label>Modelo:</label>
-          <input v-model="form.modelo" placeholder="Ej: Modelo 123" required>
+          <input v-model="form.Model" placeholder="Ej: Pro 2" required>
+        </div>
+
+        <div class="form-group">
+          <label>Imagen (URL):</label>
+          <input v-model="form.Image" placeholder="https://ejemplo.com/imagen.jpg">
         </div>
 
         <div class="form-group">
           <label>Precio por hora (S/):</label>
-          <input v-model="form.precio" type="number" step="0.01" placeholder="1.50" required>
+          <input v-model="form.Price" type="number" step="0.01" placeholder="1.50" required>
         </div>
 
-        <div class="form-group">
-          <label>Dirección:</label>
-          <input v-model="form.direccion" placeholder="Ej: Los Olivos 123" required>
-        </div>
+        <div class="form-section">
+          <h3>Ubicación</h3>
 
-        <div class="form-group">
-          <label>Contacto:</label>
-          <input v-model="form.contacto" placeholder="Ej: 999-999-999" required>
+          <div class="form-group">
+            <label>Calle:</label>
+            <input v-model="form.Street" placeholder="Ej: Av. Los Olivos 123" required>
+          </div>
+
+          <div class="form-group">
+            <label>Barrio/Urbanización:</label>
+            <input v-model="form.Neighborhood" placeholder="Ej: Urb. Los Jardines" required>
+          </div>
+
+          <div class="form-group">
+            <label>Ciudad:</label>
+            <input v-model="form.City" placeholder="Ej: Lima" required>
+          </div>
+
+          <div class="form-group">
+            <label>Distrito:</label>
+            <input v-model="form.District" placeholder="Ej: San Isidro" required>
+          </div>
         </div>
 
         <div class="form-actions">
@@ -46,28 +60,71 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { getAuth } from 'firebase/auth';
 import api from '@/api';
 
 const router = useRouter();
 const auth = getAuth();
+const profileId = ref(null);
+const profile = ref({});
+const error = ref(null);
+
 
 const form = ref({
-  nombre: '',
-  marca: '',
-  modelo: '',
-  precio: null,
-  direccion: '',
-  contacto: '',
-  propietario: auth.currentUser?.email || ''
+  Brand: '',
+  Image: '',
+  Street: '',
+  Neighborhood: '',
+  City: '',
+  District: '',
+  Price: null,
+  Model: '',
+  ProfileId: null
+});
+
+onMounted(async () => {
+  try {
+    if (auth.currentUser) {
+      const userEmail = auth.currentUser.email;
+
+      const response = await api.get(`Profile/${userEmail}`);
+      if (response.data && response.data.id) {
+        profileId.value = response.data.id;
+        form.value.ProfileId = profileId.value;
+      } else {
+        error.value = "No se encontró información del perfil";
+        alert('No se encontró un perfil para este usuario. Por favor, actualiza tu perfil primero.');
+        router.push('/profile');
+      }
+    }
+  } catch (error) {
+    console.error('Error al obtener el perfil:', error);
+  }
 });
 
 const handleSubmit = async () => {
   try {
-    await api.post('/scooters', form.value);
-    router.push('/mis-scooters');
+
+    if (!form.value.ProfileId && profileId.value) {
+      form.value.ProfileId = profileId.value;
+    }
+
+    const scooterData = {
+      brand: form.value.Brand,
+      image: form.value.Image || '',
+      street: form.value.Street,
+      neighborhood: form.value.Neighborhood,
+      city: form.value.City,
+      district: form.value.District,
+      price: parseFloat(form.value.Price).toFixed(2),
+      model: form.value.Model,
+      profileId: form.value.ProfileId
+    };
+
+    await api.post('/Scooter', scooterData);
+    await router.push('/mis-scooters');
   } catch (error) {
     console.error('Error al publicar scooter:', error);
     alert('Ocurrió un error al publicar tu scooter');
@@ -136,6 +193,17 @@ const cancelar = () => {
   outline: none;
 }
 
+.form-section {
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+  margin-top: 10px;
+}
+
+.form-section h3 {
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
 .form-actions {
   display: flex;
   gap: 15px;
@@ -170,34 +238,5 @@ const cancelar = () => {
 
 .cancel-btn:hover {
   background: #e0e0e0;
-}
-
-.footer-links {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 30px;
-  margin-top: 40px;
-}
-
-.links-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.links-section h3 {
-  font-size: 1.2rem;
-  color: #2c3e50;
-  margin-bottom: 10px;
-}
-
-.links-section a {
-  color: #555;
-  text-decoration: none;
-  transition: color 0.3s;
-}
-
-.links-section a:hover {
-  color: #0066cc;
 }
 </style>

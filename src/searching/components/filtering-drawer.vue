@@ -6,9 +6,9 @@ const emit = defineEmits(['filter-applied']);
 const visible = ref(false);
 
 const districts = ref([
-  { id: 1, name: 'Distrito 1' },
-  { id: 2, name: 'Distrito 2' },
-  { id: 3, name: 'Distrito 3' },
+  { id: 1, name: 'San Isidro' },
+  { id: 2, name: 'San Miguel' },
+  { id: 3, name: 'San Borja' },
 ]);
 
 const selectedDistrict = ref();

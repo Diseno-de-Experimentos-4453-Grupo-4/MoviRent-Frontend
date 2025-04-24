@@ -1,6 +1,11 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import api from '@/api';
+import { useRouter } from 'vue-router';
+import { useScooterStore } from '@/stores/scooterStore';
+
+const router = useRouter();
+const scooterStore = useScooterStore();
 
 const props = defineProps({
   filters: {
@@ -25,6 +30,7 @@ const hasActiveFilters = computed(() => {
 const fetchScooters = async () => {
   if (!hasActiveFilters.value) {
     scooters.value = [];
+    scooterStore.setScooters([]);
     return;
   }
 
@@ -33,21 +39,28 @@ const fetchScooters = async () => {
     let response;
 
     if (props.filters.district) {
-      response = await api.get(`/api/v1/Scooter/district?district=${encodeURIComponent(props.filters.district.name)}`);
+      response = await api.get(`/Scooter/district?district=${encodeURIComponent(props.filters.district.name)}`);
     } else if (props.filters.address && props.filters.address.trim() !== '') {
-      response = await api.get(`/api/v1/Scooter/address/${encodeURIComponent(props.filters.address)}`);
+      response = await api.get(`/Scooter/address/${encodeURIComponent(props.filters.address)}`);
     } else {
       return;
     }
 
     scooters.value = response.data;
+    scooterStore.setScooters(response.data);
     initialized.value = true;
   } catch (error) {
     console.error('Error al cargar los scooters:', error);
     scooters.value = [];
+    scooterStore.setScooters([]);
   } finally {
     loading.value = false;
   }
+};
+
+const navigateToDetails = (scooter) => {
+  scooterStore.setSelectedScooter(scooter);
+  router.push(`/scooter/${scooter.id}`);
 };
 
 watch(() => props.filters, () => {
@@ -98,7 +111,7 @@ onMounted(() => {
                 <Button
                   label="Ver detalles"
                   class="p-button-primary"
-                  @click="$router.push(`/scooter/${scooter.id}`)"
+                  @click="navigateToDetails(scooter)"
                 />
               </div>
             </div>

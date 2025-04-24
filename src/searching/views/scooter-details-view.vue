@@ -1,33 +1,38 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import ScooterDetailsCard from '../components/scooter-details-card.vue';
+import { useScooterStore } from '@/stores/scooterStore';
 
 const route = useRoute();
+const router = useRouter();
+const scooterStore = useScooterStore();
 const scooterId = route.params.id;
-const scooter = ref(null);
-const loading = ref(true);
+const loading = ref(false);
+const error = ref(null);
 
-const fetchScooterDetails = () => {
-  loading.value = true;
-  setTimeout(() => {
-    scooter.value = {
-      id: scooterId,
-      name: 'Scooter Eléctrico Premium',
-      brand: 'Xiaomi',
-      model: 'Pro 2',
-      pricePerHour: 15.99,
-      address: 'Av. Principal 123, Distrito 1',
-      contact: '999-888-777',
-      image: 'https://picsum.photos/800/800'
-    };
-    loading.value = false;
-  }, 500);
-};
+const scooter = computed(() => {
+  if (scooterStore.selectedScooter && scooterStore.selectedScooter.id === scooterId) {
+    return scooterStore.selectedScooter;
+  }
+
+  const foundScooter = scooterStore.getScooterById(scooterId);
+  if (foundScooter) {
+    return foundScooter;
+  }
+
+  return null;
+});
 
 onMounted(() => {
-  fetchScooterDetails();
+  if (!scooter.value) {
+    error.value = "No se encontró el scooter solicitado. Por favor, regrese a la búsqueda.";
+  }
 });
+
+const goBackToSearch = () => {
+  router.push('/buscar');
+};
 </script>
 
 <template>
@@ -36,7 +41,20 @@ onMounted(() => {
       <ProgressSpinner class="spinner"/>
       <span class="ml-2">Cargando detalles del scooter...</span>
     </div>
-    <ScooterDetailsCard v-else :scooter="scooter" />
+
+    <div v-else-if="error" class="error-container flex flex-col justify-center items-center p-8">
+      <i class="pi pi-exclamation-triangle text-3xl mb-4 text-red-500"></i>
+      <span class="text-xl mb-4">{{ error }}</span>
+      <Button label="Volver a la búsqueda" @click="goBackToSearch" />
+    </div>
+
+    <ScooterDetailsCard v-else-if="scooter" :scooter="scooter" />
+
+    <div v-else class="error-container flex flex-col justify-center items-center p-8">
+      <i class="pi pi-exclamation-triangle text-3xl mb-4 text-red-500"></i>
+      <span class="text-xl mb-4">No se encontraron datos del scooter. Por favor, regrese a la búsqueda.</span>
+      <Button label="Volver a la búsqueda" @click="goBackToSearch" />
+    </div>
   </div>
 </template>
 
@@ -45,7 +63,12 @@ onMounted(() => {
   min-height: 80vh;
 }
 
-.loading-container {
+.loading-container, .error-container {
   min-height: 400px;
+}
+
+.error-container {
+  flex-direction: column;
+  text-align: center;
 }
 </style>

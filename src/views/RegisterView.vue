@@ -2,26 +2,63 @@
   <div class="register-container">
     <h1>Regístrate y sé parte de esta gran comunidad</h1>
     <p v-if="error" class="error-message">{{ error }}</p>
-    <div class="input-group">
-      <label>Nombre completo</label>
-      <input type="text" placeholder="Ingresa tu nombre" v-model="userData.name">
+
+    <div class="form-section">
+      <h3>Datos de cuenta</h3>
+      <div class="input-group">
+        <label>Correo</label>
+        <input type="email" placeholder="Ingresa tu correo" v-model="userData.email" required>
+      </div>
+      <div class="input-group">
+        <label>Contraseña</label>
+        <input type="password" placeholder="Ingresa tu contraseña" v-model="userData.password" required>
+      </div>
     </div>
-    <div class="input-group">
-      <label>Contraseña</label>
-      <input type="password" placeholder="Ingresa tu contraseña" v-model="userData.password">
+
+    <div class="form-section">
+      <h3>Datos personales</h3>
+      <div class="input-group">
+        <label>Nombre</label>
+        <input type="text" placeholder="Ingresa tu nombre" v-model="userData.firstName" required>
+      </div>
+      <div class="input-group">
+        <label>Apellido</label>
+        <input type="text" placeholder="Ingresa tu apellido" v-model="userData.lastName" required>
+      </div>
+      <div class="input-group">
+        <label>DNI</label>
+        <input type="text" placeholder="Ingresa tu DNI" v-model="userData.dni" required>
+      </div>
+      <div class="input-group">
+        <label>Edad</label>
+        <input type="number" placeholder="Ingresa tu edad" v-model="userData.age" required>
+      </div>
+      <div class="input-group">
+        <label>Teléfono</label>
+        <input type="tel" placeholder="Ingresa tu número de teléfono" v-model="userData.phone" required>
+      </div>
     </div>
-    <div class="input-group">
-      <label>Teléfono</label>
-      <input type="tel" placeholder="Ingresa tu número de teléfono" v-model="userData.phone">
+
+    <div class="form-section">
+      <h3>Dirección</h3>
+      <div class="input-group">
+        <label>Calle</label>
+        <input type="text" placeholder="Ingresa tu calle" v-model="userData.street">
+      </div>
+      <div class="input-group">
+        <label>Barrio/Urbanización</label>
+        <input type="text" placeholder="Ingresa tu barrio" v-model="userData.neighborhood">
+      </div>
+      <div class="input-group">
+        <label>Ciudad</label>
+        <input type="text" placeholder="Ingresa tu ciudad" v-model="userData.city">
+      </div>
+      <div class="input-group">
+        <label>Distrito</label>
+        <input type="text" placeholder="Ingresa tu distrito" v-model="userData.district">
+      </div>
     </div>
-    <div class="input-group">
-      <label>Correo</label>
-      <input type="email" placeholder="Ingresa tu correo" v-model="userData.email">
-    </div>
-    <div class="input-group">
-      <label>DNI</label>
-      <input type="text" placeholder="Ingresa tu DNI" v-model="userData.dni">
-    </div>
+
     <button class="register-button" @click="handleRegister" :disabled="isRegistering">
       {{ isRegistering ? 'Registrando...' : 'Registrarse' }}
     </button>
@@ -40,16 +77,22 @@ const router = useRouter();
 const error = ref('');
 const isRegistering = ref(false);
 const userData = ref({
-  name: '',
-  password: '',
-  phone: '',
+  firstName: '',
+  lastName: '',
   email: '',
-  dni: ''
+  password: '',
+  dni: '',
+  age: null,
+  phone: '',
+  street: '',
+  neighborhood: '',
+  city: '',
+  district: ''
 });
 
 const validateForm = () => {
-  if (!userData.value.name.trim()) {
-    error.value = 'El nombre es obligatorio';
+  if (!userData.value.firstName.trim() || !userData.value.lastName.trim()) {
+    error.value = 'El nombre y apellido son obligatorios';
     return false;
   }
 
@@ -65,6 +108,16 @@ const validateForm = () => {
 
   if (!userData.value.dni.trim()) {
     error.value = 'El DNI es obligatorio';
+    return false;
+  }
+
+  if (!userData.value.age || userData.value.age < 18) {
+    error.value = 'Debes tener al menos 18 años';
+    return false;
+  }
+
+  if (!userData.value.phone.trim()) {
+    error.value = 'El teléfono es obligatorio';
     return false;
   }
 
@@ -90,7 +143,7 @@ const handleRegister = async () => {
 
 <style scoped>
 .register-container {
-  max-width: 500px;
+  max-width: 600px;
   margin: 2rem auto;
   padding: 1rem;
   font-family: Arial, sans-serif;
@@ -105,6 +158,18 @@ h1 {
   color: #333;
   margin-bottom: 1.5rem;
   font-size: 1.5rem;
+}
+.form-section {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+}
+.form-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #0066cc;
+  font-size: 1.2rem;
 }
 .input-group {
   margin-bottom: 1rem;

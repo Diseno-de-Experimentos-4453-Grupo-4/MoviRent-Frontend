@@ -12,20 +12,30 @@ export default {
     }
   },
 
-  async register({ email, password, name, phone, dni }) {
+  async register({ email, password, firstName, lastName, phone, dni, age, street, neighborhood, city, district }) {
     try {
+      // 1. Crear el usuario en Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
       await updateProfile(userCredential.user, {
-        displayName: name
+        displayName: `${firstName} ${lastName}`
       });
 
-      await api.post('/usuarios', {
-        email,
-        nombre: name,
-        telefono: phone,
-        dni
-      });
+      // 3. Crear el perfil en la API
+      const profileData = {
+        FirstName: firstName,
+        LastName: lastName,
+        Email: email,
+        Dni: dni,
+        Age: age,
+        Phone: phone,
+        Street: street || "",
+        Neighborhood: neighborhood || "",
+        City: city || "",
+        District: district || ""
+      };
+
+      await api.post('/profile', profileData);
 
       return userCredential.user;
     } catch (error) {
