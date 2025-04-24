@@ -2,6 +2,9 @@
   <div class="my-scooters-view">
     <div class="header">
       <h1>Mis Scooters</h1>
+      <button @click="goToAddScooter" class="add-scooter-button">
+        <span class="icon">+</span> Agregar Scooter
+      </button>
     </div>
 
     <div class="scooters-horizontal-scroll">
@@ -14,9 +17,11 @@
           <h2>{{ scooter.modelo }}</h2>
         </div>
         <div class="card-content">
-          <p><strong>Batería:</strong> {{ scooter.bateria }}%</p>
           <p><strong>Estado:</strong> {{ scooter.estado }}</p>
+          <p><strong>Marca:</strong> {{ scooter.marca }}</p>
           <p v-if="scooter.precio_hora"><strong>Precio/hora:</strong> S/{{ scooter.precio_hora }}</p>
+          <p><strong>Direccion:</strong> {{ scooter.direccion }}</p>
+          <p><strong>Contacto:</strong> {{ scooter.contacto }}</p>
         </div>
         <button class="detail-btn">Ver detalle</button>
       </div>
@@ -32,9 +37,15 @@
 import { ref, onMounted } from 'vue';
 import api from '@/api';
 import { getAuth } from 'firebase/auth';
+import { useRouter } from 'vue-router';
 
 const userScooters = ref([]);
 const loading = ref(true);
+const router = useRouter();
+
+const goToAddScooter = () => {
+  router.push('/publicar-scooter');
+};
 
 onMounted(async () => {
   try {
@@ -55,9 +66,10 @@ onMounted(async () => {
 
 <style scoped>
 .my-scooters-view {
-  padding: 20px;
+  padding: 30px;
   max-width: 1200px;
   margin: 0 auto;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .header {
@@ -67,83 +79,127 @@ onMounted(async () => {
 
 .header h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.add-scooter-button {
+  background: linear-gradient(135deg, #0066cc, #004d99);
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.add-scooter-button:hover {
+  background: linear-gradient(135deg, #004d99, #003366);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 102, 204, 0.4);
+}
+
+.add-scooter-button .icon {
+  font-size: 1.2rem;
 }
 
 .scooters-horizontal-scroll {
   display: flex;
-  gap: 20px;
+  gap: 25px;
   overflow-x: auto;
-  padding-bottom: 20px;
+  padding-bottom: 25px;
   scrollbar-width: thin;
+  min-height: 300px;
 }
 
 .scooters-horizontal-scroll::-webkit-scrollbar {
   height: 8px;
 }
+
 .scooters-horizontal-scroll::-webkit-scrollbar-thumb {
   background: #0066cc;
   border-radius: 4px;
 }
 
+
 .scooter-card {
-  min-width: 280px;
+  min-width: 300px;
   background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 15px;
-  transition: transform 0.3s ease;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  padding: 0;
+  transition: all 0.3s ease;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .scooter-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
 }
 
 .card-header {
-  background-color: #0066cc;
+  background: linear-gradient(135deg, #0066cc, #004d99);
   color: white;
-  padding: 15px;
-  margin: -15px -15px 15px -15px;
-  border-radius: 10px 10px 0 0;
+  padding: 18px;
+  margin: 0;
 }
 
 .card-header h2 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
+  font-weight: 600;
 }
 
 .card-content {
-  padding: 0 10px;
+  padding: 18px;
 }
 
 .card-content p {
-  margin: 8px 0;
+  margin: 10px 0;
   color: #555;
+  font-size: 1rem;
+}
+
+.card-content strong {
+  color: #333;
+  font-weight: 600;
 }
 
 .detail-btn {
-  width: 100%;
-  padding: 10px;
-  margin-top: 15px;
-  background-color: #0066cc;
+  width: calc(100% - 36px);
+  margin: 0 18px 18px;
+  padding: 12px;
+  background: linear-gradient(135deg, #0066cc, #004d99);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .detail-btn:hover {
-  background-color: #0052a3;
+  background: linear-gradient(135deg, #004d99, #003366);
 }
 
 .no-scooters {
   text-align: center;
   width: 100%;
-  padding: 40px;
+  padding: 60px 20px;
   color: #666;
+  font-size: 1.1rem;
   font-style: italic;
+  background: #f9f9f9;
+  border-radius: 12px;
+  margin-top: 20px;
 }
 </style>

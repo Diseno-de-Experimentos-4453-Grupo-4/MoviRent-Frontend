@@ -44,6 +44,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/publicar-scooter',
+    name: 'publicar-scooter',
+    component: () => import('@/views/PublicarScooterView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/'
   }
