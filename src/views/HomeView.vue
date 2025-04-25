@@ -56,7 +56,7 @@
       </div>
     </div>
 
-    <button class="history-button">Ver Historial</button>
+    <button class="history-button" @click="goToHistory">Ver Historial</button>
   </div>
 </template>
 
@@ -65,11 +65,18 @@ import { ref, onMounted } from 'vue';
 import auth from '@/auth';
 import api from '@/api';
 import { getAuth } from 'firebase/auth';
+import { useRouter } from 'vue-router';
+import { useProfileStore } from '@/stores/profileStore.js'
 
 const profile = ref({});
 const loading = ref(true);
 const error = ref(null);
+const router = useRouter();
+const profileStore = useProfileStore();
 
+const goToHistory = () => {
+  router.push('/historial');
+};
 onMounted(async () => {
   try {
     const auth = getAuth();
@@ -90,6 +97,8 @@ onMounted(async () => {
       } else {
         error.value = "No se encontró información del perfil";
       }
+      profileStore.setProfile(profile.value);
+
 
     } else {
       error.value = "Usuario no autenticado";

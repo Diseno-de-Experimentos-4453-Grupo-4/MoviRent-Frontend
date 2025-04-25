@@ -38,30 +38,17 @@ import { ref, onMounted } from 'vue';
 import api from '@/api';
 import { getAuth } from 'firebase/auth';
 import { useRouter } from 'vue-router';
-import { useScooterStore } from '@/stores/scooterStore';
 
 const userScooters = ref([]);
 const loading = ref(true);
 const router = useRouter();
 const error = ref(null);
-const scooters = ref([]);
-const scooterStore = useScooterStore();
 
 const goToAddScooter = () => {
   router.push('/publicar-scooter');
 };
 
 const viewScooterDetails = (scooter) => {
-  const scooterData = {
-    id: scooter.id,
-    model: scooter.modelo,
-    brand: scooter.marca,
-    price: scooter.precio_hora,
-    address: scooter.direccion,
-    isAvailable: scooter.estado === "Disponible"
-  };
-
-  scooterStore.setSelectedScooter(scooterData);
 
   router.push(`/scooter/${scooter.id}`);
 };
@@ -88,7 +75,6 @@ onMounted(async () => {
           state: scooter.isAvailable ? "Disponible" : "No disponible",
           phoneNumber: profileResponse.data.phoneNumber || "No especificado"
         }));
-        scooterStore.setScooters(userScooters.value);
       } else {
         error.value = "No se encontró información del perfil";
       }

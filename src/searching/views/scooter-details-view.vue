@@ -1,33 +1,31 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ScooterDetailsCard from '../components/scooter-details-card.vue';
-import { useScooterStore } from '@/stores/scooterStore';
+import api from '@/api';
 
 const route = useRoute();
 const router = useRouter();
-const scooterStore = useScooterStore();
 const scooterId = route.params.id;
-const loading = ref(false);
+const scooter = ref(null);
+const loading = ref(true);
 const error = ref(null);
 
-const scooter = computed(() => {
-  if (scooterStore.selectedScooter && scooterStore.selectedScooter.id === scooterId) {
-    return scooterStore.selectedScooter;
+const fetchScooterDetails = async () => {
+  try {
+    loading.value = true;
+    const response = await api.get(`/Scooter/${scooterId}`);
+    scooter.value = response.data;
+  } catch (err) {
+    console.error("Error al cargar los detalles del scooter:", err);
+    error.value = "No se pudo cargar el scooter solicitado. Por favor, regrese a la búsqueda.";
+  } finally {
+    loading.value = false;
   }
-
-  const foundScooter = scooterStore.getScooterById(scooterId);
-  if (foundScooter) {
-    return foundScooter;
-  }
-
-  return null;
-});
+};
 
 onMounted(() => {
-  if (!scooter.value) {
-    error.value = "No se encontró el scooter solicitado. Por favor, regrese a la búsqueda.";
-  }
+  fetchScooterDetails();
 });
 
 const goBackToSearch = () => {

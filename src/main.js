@@ -7,6 +7,7 @@ import App from './App.vue'
 import router from './router'
 import { app as firebaseApp } from './firebase'
 import { createPinia } from 'pinia'
+import { ToastService } from 'primevue'
 
 const pinia = createPinia(App)
 const app = createApp(App);
@@ -23,4 +24,5 @@ app.use(PrimeVue,{
 
 
 app.use(pinia)
+app.use(ToastService)
 app.mount('#app')

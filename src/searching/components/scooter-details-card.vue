@@ -1,6 +1,9 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { onMounted, ref } from 'vue';
+import api from '@/api';
+import { getAuth } from 'firebase/auth'
+import { useProfileStore } from '@/stores/profileStore.js'
 
 const props = defineProps({
   scooter: {
@@ -11,6 +14,10 @@ const props = defineProps({
 
 const router = useRouter();
 const hoursToRent = ref(1);
+const loading = ref(false);
+const profileId = ref(null);
+const error = ref(null);
+const profileStore = useProfileStore();
 
 const goBackToSearch = () => {
   router.back();
@@ -20,7 +27,30 @@ const openReviews = () => {
   router.push(`/reviews/${props.scooter.id}`);
 };
 
+const rentScooter = async () => {
+  loading.value = true;
+  const profile = profileStore.getProfile();
+  if (!profile) {
+    error.value = 'No se encontró el perfil del usuario';
+    loading.value = false;
+    return;
+  }
+  profileId.value = profile.id;
+  console.log(profileId);
 
+  try {
+    const bookingData = {
+      ProfileId: profileId.value,
+      ScooterId: props.scooter.id,
+    }
+    await api.post('/Booking', bookingData);
+    router.push('/historial');
+  } catch (error) {
+    console.error('Error al alquilar el scooter:', error);
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -64,7 +94,13 @@ const openReviews = () => {
             </div>
 
             <div class="action-buttons flex gap-2 justify-center mt-4 w-full">
-              <Button label="Alquilar" class="p-button-success" />
+              <Button
+                label="Alquilar"
+                class="p-button-success"
+                @click="rentScooter"
+                :loading="loading"
+                :disabled="loading"
+              />
               <Button label="Regresar" @click="goBackToSearch" class="p-button-secondary" />
             </div>
           </div>

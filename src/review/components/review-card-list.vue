@@ -1,76 +1,71 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import api from '../../api';
-import { getAuth } from 'firebase/auth'
+import { onMounted, ref, watch } from 'vue'
+import api from '../../api'
 
 const props = defineProps({
   scooterId: {
     type: Number,
-    required: true
-  }
-});
+    required: true,
+  },
+})
 
-const reviews = ref([]);
-const loading = ref(false);
-const error = ref(null);
-
+const reviews = ref([])
+const loading = ref(false)
+const error = ref(null)
 
 const fetchReviews = async () => {
-  if (!props.scooterId) return;
+  if (!props.scooterId) return
 
-  loading.value = true;
-  error.value = null;
+  loading.value = true
+  error.value = null
 
   try {
-    const response = await api.get(`/Rate/scooter?scooterId=${props.scooterId}`);
-    const reviewsData = response.data;
+    const response = await api.get(`/Rate/scooter?scooterId=${props.scooterId}`)
+    const reviewsData = response.data
 
-    const reviewsWithUserNames = await Promise.all(
+    reviews.value = await Promise.all(
       reviewsData.map(async (review) => {
         try {
-          const profileResponse = await api.get(`/Profile/${review.profileId}`);
-          const profile = profileResponse.data;
+          const profileResponse = await api.get(`/Profile/${review.profileId}`)
+          const profile = profileResponse.data
 
-          const userName = profile ?
-            `${profile.fullName || 'Usuario Anónimo'}` :
-            'Usuario Anónimo';
-
-
+          const userName = profile ? `${profile.fullName || 'Usuario Anónimo'}` : 'Usuario Anónimo'
 
           return {
             ...review,
-            userName
-          };
+            userName,
+          }
         } catch (err) {
-          console.error('Error al obtener perfil de usuario:', err);
+          console.error('Error al obtener perfil de usuario:', err)
           return {
             ...review,
-            userName: 'Usuario Anónimo'
-          };
+            userName: 'Usuario Anónimo',
+          }
         }
-      })
-    );
-
-    reviews.value = reviewsWithUserNames;
+      }),
+    )
   } catch (err) {
-    console.error('Error al obtener reseñas:', err);
-    error.value = 'No se pudieron cargar las reseñas';
+    console.error('Error al obtener reseñas:', err)
+    error.value = 'No se pudieron cargar las reseñas'
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 onMounted(() => {
-  fetchReviews();
-});
+  fetchReviews()
+})
 
-watch(() => props.scooterId, () => {
-  fetchReviews();
-});
+watch(
+  () => props.scooterId,
+  () => {
+    fetchReviews()
+  },
+)
 
 const getStars = (rating) => {
-  return "★".repeat(rating) + "☆".repeat(5 - rating);
-};
+  return '★'.repeat(rating) + '☆'.repeat(5 - rating)
+}
 </script>
 
 <template>

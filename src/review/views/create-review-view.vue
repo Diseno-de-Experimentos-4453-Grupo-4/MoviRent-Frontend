@@ -1,13 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useScooterStore } from '../../stores/scooterStore';
 import api from '../../api';
 import auth from '../../auth';
 
 const route = useRoute();
 const router = useRouter();
-const scooterStore = useScooterStore();
 const scooterId = ref(null);
 const scooterData = ref(null);
 const loading = ref(true);
@@ -22,15 +20,14 @@ onMounted(async () => {
 
   if (scooterId.value) {
     try {
-      const scooter = scooterStore.getScooterById(scooterId.value);
-
-      if (scooter) {
-        scooterData.value = scooter;
-        loading.value = false;
-      } else {
-        error.value = 'No se encontró el scooter solicitado';
-        loading.value = false;
+      loading.value = true;
+      const response = await api.get(`/Scooter/${scooterId.value}`);
+      const scooter = response.data;
+      if (!scooter) {
+        throw new Error('Scooter no encontrado');
       }
+      scooterData.value = scooter;
+
     } catch (err) {
       console.error('Error al obtener datos del scooter:', err);
       error.value = 'No se pudieron cargar los datos del scooter';
@@ -71,7 +68,6 @@ const submitReview = async () => {
 
     const profileResponse = await api.get(`/Profile/${userEmail}`);
 
-    console.log('Profile:', profileResponse.data);
     const profileId = profileResponse.data.id;
 
     const reviewData = {
