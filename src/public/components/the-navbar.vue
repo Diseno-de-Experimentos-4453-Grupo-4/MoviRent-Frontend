@@ -42,7 +42,7 @@ onUnmounted(() => {
           <Button label="Mis scooters" variant="text" @click="$router.push('/mis-scooters')" />
           <Button label="Buscar" variant="text" @click="$router.push('/buscar')" />
           <Button label="Perfil" variant="text" @click="$router.push('/perfil')" />
-          <Button label="Mi suscripción" variant="text" @click="$router.push('/suscripcion')" />
+          <Button label="Mi suscripción" variant="text" @click="$router.push('/subscription')" />
           <Button
             v-if="currentUser"
             label="Cerrar sesión"
