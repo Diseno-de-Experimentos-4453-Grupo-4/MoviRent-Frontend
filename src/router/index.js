@@ -4,6 +4,8 @@ import ScooterSearchingView from '@/searching/views/scooter-searching-view.vue';
 import LoginView from '@/views/LoginView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import HomeView from '@/views/HomeView.vue';
+import ReviewsView from '@/review/views/reviews-view.vue';
+import CreateReviewView from '@/review/views/create-review-view.vue';
 import auth from '@/auth';
 
 const routes = [
@@ -47,6 +49,17 @@ const routes = [
     path: '/publicar-scooter',
     name: 'publicar-scooter',
     component: () => import('@/views/PublicarScooterView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/reviews/:scooterId',
+    name: 'reviews',
+    component: ReviewsView
+  },
+  {
+    path: '/reviews/create/:scooterId',
+    name: 'create-review',
+    component: CreateReviewView,
     meta: { requiresAuth: true }
   },
   {

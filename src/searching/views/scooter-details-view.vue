@@ -31,7 +31,7 @@ onMounted(() => {
 });
 
 const goBackToSearch = () => {
-  router.push('/buscar');
+  router.back();
 };
 </script>
 

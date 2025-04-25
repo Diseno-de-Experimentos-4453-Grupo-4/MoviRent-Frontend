@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue';
 
 const props = defineProps({
   scooter: {
@@ -13,8 +13,13 @@ const router = useRouter();
 const hoursToRent = ref(1);
 
 const goBackToSearch = () => {
-  router.push('/buscar');
+  router.back();
 };
+
+const openReviews = () => {
+  router.push(`/reviews/${props.scooter.id}`);
+};
+
 
 </script>
 
@@ -29,7 +34,7 @@ const goBackToSearch = () => {
             <p class="italic text-sm text-center mb-4 py-5 max-w-80">
               Recuerda siempre llevar tu DNI para identificarte con el dueño antes de recoger el scooter
             </p>
-            <Button label="Reseñas" class="mb-4" />
+            <Button label="Reseñas" @click="openReviews" class="mb-4" />
             <div class="rental-hours py-5">
               <h3 class="font-semibold mb-2">Horas a alquilar:</h3>
               <div class="flex items-center">
