@@ -64,7 +64,6 @@ const viewScooterDetails = (scooter) => {
 
         <div v-else class="grid-container">
           <DataTable :value="rentedScooters" responsiveLayout="scroll">
-            <Column field="id" header="ID" :sortable="true" style="width: 10%"></Column>
             <Column header="Imagen" style="width: 20%">
               <template #body="slotProps">
                 <img

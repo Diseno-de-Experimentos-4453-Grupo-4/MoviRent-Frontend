@@ -43,7 +43,11 @@ const fetchScooters = async () => {
       return;
     }
 
-    scooters.value = response.data;
+    if (response.data && !Array.isArray(response.data)) {
+      scooters.value = [response.data];
+    } else {
+      scooters.value = response.data || [];
+    }
     initialized.value = true;
   } catch (error) {
     console.error('Error al cargar los scooters:', error);
