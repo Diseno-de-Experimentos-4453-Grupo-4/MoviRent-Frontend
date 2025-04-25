@@ -18,10 +18,11 @@
 import { useRouter } from 'vue-router';
 import { getAuth } from 'firebase/auth';
 import api from '@/api';
+import { useProfileStore } from '@/stores/profileStore.js'
 
 const router = useRouter();
 const auth = getAuth();
-
+const profileStore = useProfileStore();
 const selectPlan = async (planType) => {
   try {
     const user = auth.currentUser;
@@ -30,12 +31,11 @@ const selectPlan = async (planType) => {
       return;
     }
 
-    const response = await api.post('/api/subscriptions', {
-      userId: user.uid,
-      plan: planType,
-      email: user.email,
-      amount: 60,
-      duration: '1 month'
+    const profile = profileStore.getProfile();
+
+
+    const response = await api.post('/Subscription', {
+      profileId: profile.id,
     });
 
     console.log('Suscripción exitosa:', response.data);
