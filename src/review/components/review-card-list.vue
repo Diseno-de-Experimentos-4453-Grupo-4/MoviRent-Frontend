@@ -26,8 +26,9 @@ const fetchReviews = async () => {
     reviews.value = await Promise.all(
       reviewsData.map(async (review) => {
         try {
-          const profileResponse = await api.get(`/Profile/${review.profileId}`)
+          const profileResponse = await api.get(`/Profile/${review.scooterId}`) // En backend, parece que hay un error en la data que devuelve el endpoint de las reseñas, el valor de scooterId debería ser el id del usuario que hizo la reseña, no el del scooter
           const profile = profileResponse.data
+
 
           const userName = profile ? `${profile.fullName || 'Usuario Anónimo'}` : 'Usuario Anónimo'
 

@@ -27,6 +27,7 @@ onMounted(async () => {
         throw new Error('Scooter no encontrado');
       }
       scooterData.value = scooter;
+      loading.value = false;
 
     } catch (err) {
       console.error('Error al obtener datos del scooter:', err);
@@ -67,6 +68,8 @@ const submitReview = async () => {
     const userEmail = currentUser.email;
 
     const profileResponse = await api.get(`/Profile/${userEmail}`);
+
+
 
     const profileId = profileResponse.data.id;
 
