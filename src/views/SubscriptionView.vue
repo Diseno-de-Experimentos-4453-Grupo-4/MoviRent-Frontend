@@ -1,5 +1,5 @@
 <template>
-  <div class="subscription-view">
+  <div v-if="!isSubscribed" class="subscription-view">
     <h1>Suscripción</h1>
     <p class="intro-text">Disfruta de acceso ilimitado a nuestros scooters premium durante un mes completo.</p>
 
@@ -8,8 +8,13 @@
         <h3>Plan Mensual Premium</h3>
         <p>Acceso 7 días a la semana las 24 horas + scooters de última generación</p>
         <p class="price">S/ 60</p>
-        <button @click="selectPlan('monthly-premium')" class="subscribe-btn">Suscríbete</button>
+        <button @click="selectPlan()" class="subscribe-btn">Suscríbete</button>
       </div>
+    </div>
+  </div>
+  <div v-else >
+    <div class="subscribed-container">
+      <h1 class="font-bold text-2xl"> Ya tienes un plan de suscripción!</h1>
     </div>
   </div>
 </template>
@@ -19,11 +24,26 @@ import { useRouter } from 'vue-router';
 import { getAuth } from 'firebase/auth';
 import api from '@/api';
 import { useProfileStore } from '@/stores/profileStore.js'
+import { onMounted, ref } from 'vue'
 
 const router = useRouter();
 const auth = getAuth();
 const profileStore = useProfileStore();
-const selectPlan = async (planType) => {
+const isSubscribed = ref(false);
+
+onMounted(async () => {
+  const profile = profileStore.getProfile();
+  if (!profile) {
+    router.push('/login');
+    return;
+  }
+  const response = await api.get(`/subscription/${profile.id}`);
+  if (response.data) {
+    isSubscribed.value = response.data;
+  }
+
+})
+const selectPlan = async () => {
   try {
     const user = auth.currentUser;
     if (!user) {
@@ -34,7 +54,7 @@ const selectPlan = async (planType) => {
     const profile = profileStore.getProfile();
 
 
-    const response = await api.post('/Subscription', {
+    const response = await api.post('/subscription', {
       profileId: profile.id,
     });
 
@@ -104,6 +124,13 @@ const selectPlan = async (planType) => {
   transition: all 0.3s;
   font-size: 1.1rem;
   margin-top: 10px;
+}
+
+.subscribed-container{
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .subscribe-btn:hover {
