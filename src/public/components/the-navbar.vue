@@ -42,7 +42,6 @@ onUnmounted(() => {
           <Button label="Mis scooters" variant="text" @click="$router.push('/mis-scooters')" />
           <Button label="Buscar" variant="text" @click="$router.push('/buscar')" />
           <Button label="Perfil" variant="text" @click="$router.push('/perfil')" />
-          <Button label="Mi suscripción" variant="text" @click="$router.push('/subscription')" />
           <Button
             v-if="currentUser"
             label="Cerrar sesión"
@@ -61,9 +60,6 @@ onUnmounted(() => {
                       @click="$router.push('/buscar')" />
               <Button label="Perfil" variant="outlined" class="justify-end"
                       @click="$router.push('/perfil')" />
-              <Button label="Mi suscripción" variant="outlined" class="justify-end"
-                      @click="$router.push('/suscripcion')" />
-              <Button
                 v-if="currentUser"
                 label="Cerrar sesión"
                 severity="danger"
