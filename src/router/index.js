@@ -46,6 +46,11 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/scooter/edit/:scooterId',
+    name: 'edit-scooter',
+    component: () => import('@/views/EditarScooterView.vue'),
+  },
+  {
     path: '/publicar-scooter',
     name: 'publicar-scooter',
     component: () => import('@/views/PublicarScooterView.vue'),
@@ -78,6 +83,12 @@ const routes = [
     path: '/subscription',
     name: 'subscription',
     component: () => import('@/views/SubscriptionView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/estados-reserva',
+    name: 'reservation-status',
+    component: () => import('@/reservation/views/ScooterReservationStatus.vue'),
     meta: { requiresAuth: true }
   },
   {

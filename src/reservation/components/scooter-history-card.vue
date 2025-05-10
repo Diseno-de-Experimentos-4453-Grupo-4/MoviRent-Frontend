@@ -25,6 +25,13 @@ onMounted(async () => {
 
     const scootersResponses = await Promise.all(scootersPromises);
     rentedScooters.value = scootersResponses.map(response => response.data);
+    rentedScooters.value = rentedScooters.value.map((scooter, index) => ({
+      ...scooter,
+      state: bookings.value[index].statusId === 1 ? 'Reservado' :
+        bookings.value[index].statusId === 2 ? 'Pendiente' :
+          'Cancelado/Expirado',
+    }));
+
   } catch (err) {
     console.error("Error al cargar el historial de alquileres:", err);
     error.value = "No se pudo cargar el historial de alquileres";
@@ -82,6 +89,11 @@ const viewScooterDetails = (scooter) => {
                   class="p-button-primary"
                   @click="viewScooterDetails(slotProps.data)"
                 />
+              </template>
+            </Column>
+            <Column field="state" header="Estado" :sortable="true" style="width: 10%">
+              <template #body="slotProps">
+                <span>{{ slotProps.data.state }}</span>
               </template>
             </Column>
           </DataTable>

@@ -2,8 +2,8 @@
 import { useRouter } from 'vue-router';
 import { onMounted, ref } from 'vue';
 import api from '@/api';
-import { getAuth } from 'firebase/auth'
-import { useProfileStore } from '@/stores/profileStore.js'
+import { getAuth } from 'firebase/auth';
+import { useProfileStore } from '@/stores/profileStore.js';
 
 const props = defineProps({
   scooter: {
@@ -15,6 +15,7 @@ const props = defineProps({
 const router = useRouter();
 const hoursToRent = ref(1);
 const loading = ref(false);
+const isOwner = ref(false);
 
 const goBackToSearch = () => {
   router.back();
@@ -30,6 +31,23 @@ const rentScooter = async () => {
     query: { hours: hoursToRent.value }
   });
 };
+
+const editScooter = () => {
+  router.push(`/scooter/edit/${props.scooter.id}`);
+};
+
+onMounted(async () => {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+
+  if (currentUser) {
+    const userEmail = currentUser.email;
+    const response = await api.get(`/Profile/${userEmail}`);
+    if (response.data && response.data.id === props.scooter.profileId) {
+      isOwner.value = true;
+    }
+  }
+});
 </script>
 
 <template>
@@ -44,7 +62,7 @@ const rentScooter = async () => {
               Recuerda siempre llevar tu DNI para identificarte con el dueño antes de recoger el scooter
             </p>
             <Button label="Reseñas" @click="openReviews" class="mb-4" />
-            <div class="rental-hours py-5">
+            <div v-if="!isOwner" class="rental-hours py-5">
               <h3 class="font-semibold mb-2">Horas a alquilar:</h3>
               <div class="flex items-center">
                 <InputNumber v-model="hoursToRent" :min="1" :max="24" showButtons class="w-full" />
@@ -52,7 +70,7 @@ const rentScooter = async () => {
             </div>
           </div>
 
-          <div class="scooter-info flex flex-col  items-center justify-center">
+          <div class="scooter-info flex flex-col items-center justify-center">
             <div class="info-fields flex-grow gap-8 w-full max-w-md">
               <div class="field mb-3">
                 <label class="font-bold">Marca:</label>
@@ -74,6 +92,13 @@ const rentScooter = async () => {
 
             <div class="action-buttons flex gap-2 justify-center mt-4 w-full">
               <Button
+                v-if="isOwner"
+                label="Editar"
+                class="p-button-warning"
+                @click="editScooter"
+              />
+              <Button
+                v-else
                 label="Alquilar"
                 class="p-button-success"
                 @click="rentScooter"

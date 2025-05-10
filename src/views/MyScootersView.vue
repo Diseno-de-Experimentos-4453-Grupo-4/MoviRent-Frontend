@@ -7,6 +7,12 @@
       </button>
     </div>
 
+    <div class="buttons-container" v-if="userScooters.length > 0">
+      <button class="reservation-status-button" @click="goToReservationStatus">
+        Ver estados de reserva
+      </button>
+    </div>
+
     <div class="scooters-horizontal-scroll">
       <div
         v-for="scooter in userScooters"
@@ -48,8 +54,11 @@ const goToAddScooter = () => {
   router.push('/publicar-scooter');
 };
 
-const viewScooterDetails = (scooter) => {
+const goToReservationStatus = () => {
+  router.push('/estados-reserva');
+};
 
+const viewScooterDetails = (scooter) => {
   router.push(`/scooter/${scooter.id}`);
 };
 
@@ -136,6 +145,31 @@ onMounted(async () => {
   font-size: 1.2rem;
 }
 
+.buttons-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.reservation-status-button {
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  transition: all 0.3s ease;
+}
+
+.reservation-status-button:hover {
+  background: linear-gradient(135deg, #2E7D32, #1B5E20);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+}
+
 .scooters-horizontal-scroll {
   display: flex;
   gap: 25px;
@@ -153,7 +187,6 @@ onMounted(async () => {
   background: #0066cc;
   border-radius: 4px;
 }
-
 
 .scooter-card {
   min-width: 300px;

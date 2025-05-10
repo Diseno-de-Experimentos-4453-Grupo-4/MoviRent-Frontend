@@ -60,6 +60,7 @@ onUnmounted(() => {
                       @click="$router.push('/buscar')" />
               <Button label="Perfil" variant="outlined" class="justify-end"
                       @click="$router.push('/perfil')" />
+              <Button
                 v-if="currentUser"
                 label="Cerrar sesión"
                 severity="danger"
