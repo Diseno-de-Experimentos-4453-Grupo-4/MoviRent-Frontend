@@ -74,6 +74,18 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/booking/verify-transaction/:profileId/:bookingId',
+    name: 'verify-transaction',
+    component: () => import('@/reservation/views/verificar-transaccion-view.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/booking/reservation-details/:profileId/:bookingId',
+    name: 'reservation-details',
+    component: () => import('@/reservation/views/ScooterReservationDetails.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/historial',
     name: 'history',
     component: () => import('@/reservation/views/scooter-history-view.vue'),

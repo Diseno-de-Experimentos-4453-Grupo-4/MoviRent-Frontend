@@ -57,11 +57,15 @@
 import { ref, onMounted } from 'vue';
 import api from '@/api';
 import { getAuth } from 'firebase/auth';
+import { useRouter } from 'vue-router'
 
 const scootersWithStatus = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const profileId = ref(null);
+const router = useRouter();
+const uncompletedBookings = ref([]);
+const completedBookings = ref([]);
 
 const getStatusClass = (status) => {
   switch(status) {
@@ -80,11 +84,27 @@ const getStatusText = (status) => {
 };
 
 const verifyTransaction = (scooter) => {
-  console.log('Verificando transacción del scooter:', scooter.id);
+  const booking = uncompletedBookings.value.find(b => b.scooterId === scooter.id && b.statusId === 2);
+  if (booking) {
+    router.push({
+      name: 'verify-transaction',
+      params: { profileId:scooter.profileId, bookingId: booking.id }
+    });
+  } else {
+    alert('No se encontró un booking pendiente para este scooter.');
+  }
 };
 
 const viewTransactionDetails = (scooter) => {
-  console.log('Ver detalles de la transacción del scooter:', scooter.id);
+  const booking = completedBookings.value.find(b => b.scooterId === scooter.id && b.statusId === 1);
+  if (booking) {
+    router.push({
+      name: 'reservation-details',
+      params: { profileId: scooter.profileId, bookingId: booking.id }
+    });
+  } else {
+    alert('No se encontró un booking pendiente para este scooter.');
+  }
 };
 
 onMounted(async () => {
@@ -103,15 +123,17 @@ onMounted(async () => {
         const scootersResponse = await api.get(`/Scooter/profile?profileId=${profileId.value}`);
         const userScooters = scootersResponse.data || [];
 
-        const bookingsResponse = await api.get(`/Booking?profileId=${profileId.value}`);
-        const bookings = bookingsResponse.data || [];
+        const uncompletedBookingsResponse = await api.get(`/Booking/own/state?profileId=${profileId.value}&statusId=2`);
+        uncompletedBookings.value = uncompletedBookingsResponse.data || [];
+
+        const completedBookingsResponse = await api.get(`/Booking/own/state?profileId=${profileId.value}&statusId=1`);
+        completedBookings.value = completedBookingsResponse.data || [];
 
         scootersWithStatus.value = userScooters.map(scooter => {
           let status = scooter.isAvailable ? 'not-reserved' : 'reserved';
 
-          const scooterBookings = bookings.filter(booking => booking.scooterId === scooter.id);
+          const scooterBookings = uncompletedBookings.value.filter(booking => booking.scooterId === scooter.id);
 
-          console.log('scooterBookings', scooterBookings);
 
           if (scooterBookings.some(booking => booking.statusId === 2)) {
             status = 'in-progress';
@@ -120,6 +142,7 @@ onMounted(async () => {
           return {
             ...scooter,
             status,
+            bookingId: scooterBookings.length > 0 ? scooterBookings[0].id : null,
             image: scooter.image || null
           };
         });
@@ -177,7 +200,7 @@ onMounted(async () => {
 
 .scooters-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: 1fr;
   gap: 25px;
 }
 
@@ -210,7 +233,7 @@ onMounted(async () => {
 }
 
 .scooter-image {
-  width: 40%;
+  width: 25%;
   min-width: 150px;
   display: flex;
   align-items: center;
