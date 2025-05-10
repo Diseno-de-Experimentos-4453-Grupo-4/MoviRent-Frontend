@@ -57,6 +57,12 @@ const routes = [
     component: ReviewsView
   },
   {
+    path: '/booking/complete-booking/:scooterId',
+    name: 'complete-booking',
+    component: () => import('@/reservation/views/completar-reserva-view.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/reviews/create/:scooterId',
     name: 'create-review',
     component: CreateReviewView,

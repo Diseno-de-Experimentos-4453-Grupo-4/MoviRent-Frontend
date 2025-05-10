@@ -15,9 +15,6 @@ const props = defineProps({
 const router = useRouter();
 const hoursToRent = ref(1);
 const loading = ref(false);
-const profileId = ref(null);
-const error = ref(null);
-const profileStore = useProfileStore();
 
 const goBackToSearch = () => {
   router.back();
@@ -28,28 +25,10 @@ const openReviews = () => {
 };
 
 const rentScooter = async () => {
-  loading.value = true;
-  const profile = profileStore.getProfile();
-  if (!profile) {
-    error.value = 'No se encontró el perfil del usuario';
-    loading.value = false;
-    return;
-  }
-  profileId.value = profile.id;
-  console.log(profileId);
-
-  try {
-    const bookingData = {
-      ProfileId: profileId.value,
-      ScooterId: props.scooter.id,
-    }
-    await api.post('/Booking', bookingData);
-    router.push('/historial');
-  } catch (error) {
-    console.error('Error al alquilar el scooter:', error);
-  } finally {
-    loading.value = false;
-  }
+  await router.push({
+    path: '/booking/complete-booking/' + props.scooter.id,
+    query: { hours: hoursToRent.value }
+  });
 };
 </script>
 

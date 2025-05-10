@@ -48,11 +48,16 @@
             <label>Distrito:</label>
             <input v-model="form.District" placeholder="Ej: San Isidro" required>
           </div>
+
+          <div class="form-group">
+            <label>Número de Cuenta Bancaria asociado:</label>
+            <input v-model="form.BankAccount" placeholder="Ej: 1234567890" required>
         </div>
 
         <div class="form-actions">
           <button type="submit" class="submit-btn">Crear</button>
           <button type="button" @click="cancelar" class="cancel-btn">Cancelar</button>
+        </div>
         </div>
       </form>
     </div>
@@ -81,7 +86,8 @@ const form = ref({
   District: '',
   Price: null,
   Model: '',
-  ProfileId: null
+  ProfileId: null,
+  BankAccount: ''
 });
 
 onMounted(async () => {
@@ -120,7 +126,8 @@ const handleSubmit = async () => {
       district: form.value.District,
       price: parseFloat(form.value.Price).toFixed(2),
       model: form.value.Model,
-      profileId: form.value.ProfileId
+      profileId: form.value.ProfileId,
+      bankAccount: form.value.BankAccount,
     };
 
     await api.post('/Scooter', scooterData);
