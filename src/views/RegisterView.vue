@@ -132,7 +132,7 @@ const handleRegister = async () => {
 
   try {
     await auth.register(userData.value);
-    router.push('/');
+    await router.push('/two-factor-verification');
   } catch (err) {
     error.value = err.message;
   } finally {

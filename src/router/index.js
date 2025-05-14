@@ -104,6 +104,13 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/two-factor-verification',
+    name: 'two-factor-verification',
+    component: () => import('@/views/TwoFactorVerificationView.vue'),
+    meta: { requiresGuest: true }
+  },
+
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/'
   }

@@ -1,22 +1,27 @@
-import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth } from './firebase';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';import { auth } from './firebase';
 import api from './api';
 
 export default {
   async login(email, password) {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const response = await signInWithEmailAndPassword(auth, email, password);
+      const user = response.user;
+      if (user != null && !user.emailVerified) {
+        await sendEmailVerification(user);
+        await signOut(auth);
+        throw new Error('Por favor, verifica tu correo electrónico antes de iniciar sesión.');
+      }
       return auth.currentUser;
     } catch (error) {
+      if (error.message.includes('verifica tu correo electrónico')) {
+        throw error;
+      }
       throw new Error('Credenciales incorrectas. Por favor, inténtalo de nuevo.');
     }
   },
 
   async register({ email, password, firstName, lastName, phone, dni, age, street, neighborhood, city, district }) {
     try {
-
-
-
 
       const profileData = {
         FirstName: firstName,
@@ -36,7 +41,11 @@ export default {
       await updateProfile(userCredential.user, {
         displayName: `${firstName} ${lastName}`
       });
-      return userCredential.user;
+
+      await sendEmailVerification(userCredential.user);
+
+      await signOut(auth);
+      return { message: 'Usuario registrado. Por favor, verifica tu correo electrónico.' };
     } catch (error) {
       console.error('Error durante el registro:', error);
       if (error.code === 'auth/email-already-in-use') {

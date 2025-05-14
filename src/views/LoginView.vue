@@ -2,6 +2,7 @@
   <div class="login-container">
     <h1>Iniciar sesión</h1>
     <p v-if="error" class="error-message">{{ error }}</p>
+    <p v-if="verificationMessage" class="verification-message">{{ verificationMessage }}</p>
     <div class="input-group">
       <label>Correo</label>
       <input type="email" placeholder="ingresa tu correo" v-model="email">
@@ -26,13 +27,20 @@ const router = useRouter();
 const email = ref('');
 const password = ref('');
 const error = ref('');
+const verificationMessage = ref('');
 
 const handleLogin = async () => {
+  error.value = '';
+  verificationMessage.value = '';
   try {
     await auth.login(email.value, password.value);
     router.push('/');
   } catch (err) {
-    error.value = err.message;
+    if (err.message.includes('verifica tu correo electrónico')) {
+      verificationMessage.value = err.message;
+    } else {
+      error.value = err.message;
+    }
   }
 };
 </script>
@@ -46,6 +54,11 @@ const handleLogin = async () => {
 }
 .error-message {
   color: red;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.verification-message {
+  color: orange;
   text-align: center;
   margin-bottom: 1rem;
 }
