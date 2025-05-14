@@ -12,6 +12,9 @@
       <input type="password" placeholder="ingresa tu contraseña" v-model="password">
     </div>
     <button class="login-button" @click="handleLogin">Iniciar Sesión</button>
+    <p class="forgot-password">
+      <a @click="handlePasswordReset">¿Olvidaste tu contraseña?</a>
+    </p>
     <p class="register-prompt">
       ¿Aún no tienes una cuenta? <router-link to="/register">Regístrate</router-link>
     </p>
@@ -41,6 +44,20 @@ const handleLogin = async () => {
     } else {
       error.value = err.message;
     }
+  }
+};
+
+const handlePasswordReset = async () => {
+  if (!email.value.trim()) {
+    error.value = 'Por favor, ingresa tu correo para restablecer la contraseña.';
+    return;
+  }
+
+  try {
+    const response = await auth.resetPassword(email.value);
+    verificationMessage.value = response.message;
+  } catch (err) {
+    error.value = err.message;
   }
 };
 </script>
@@ -94,6 +111,16 @@ h1 {
   font-weight: bold;
   cursor: pointer;
   margin-top: 1rem;
+}
+.forgot-password {
+  text-align: center;
+  margin-top: 1rem;
+  color: #666;
+}
+.forgot-password a {
+  color: #0066cc;
+  text-decoration: none;
+  cursor: pointer;
 }
 .register-prompt {
   text-align: center;

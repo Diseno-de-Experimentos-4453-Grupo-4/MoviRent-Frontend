@@ -1,4 +1,4 @@
-import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';import { auth } from './firebase';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, sendPasswordResetEmail } from 'firebase/auth';import { auth } from './firebase';
 import api from './api';
 
 export default {
@@ -73,5 +73,15 @@ export default {
 
   isAuthenticated() {
     return auth.currentUser !== null;
+  },
+
+  async resetPassword(email) {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return { message: 'Se ha enviado un correo para restablecer tu contraseña.' };
+    } catch (error) {
+      console.error('Error al enviar el correo de restablecimiento:', error);
+      throw new Error('No se pudo enviar el correo de restablecimiento. Verifica el correo ingresado.');
+    }
   }
 };
