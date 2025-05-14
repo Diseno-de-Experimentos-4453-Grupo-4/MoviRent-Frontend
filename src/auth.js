@@ -14,11 +14,9 @@ export default {
 
   async register({ email, password, firstName, lastName, phone, dni, age, street, neighborhood, city, district }) {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-      await updateProfile(userCredential.user, {
-        displayName: `${firstName} ${lastName}`
-      });
+
+
 
       const profileData = {
         FirstName: firstName,
@@ -34,7 +32,10 @@ export default {
       };
 
       await api.post('/profile', profileData);
-
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(userCredential.user, {
+        displayName: `${firstName} ${lastName}`
+      });
       return userCredential.user;
     } catch (error) {
       console.error('Error durante el registro:', error);
