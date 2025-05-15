@@ -59,7 +59,16 @@
       </div>
     </div>
 
-    <button class="register-button" @click="handleRegister" :disabled="isRegistering">
+    <div class="form-section">
+      <div class="input-group terms">
+        <input type="checkbox" id="terms" v-model="acceptTerms">
+        <label for="terms">
+          Acepto los <a href="/terms-and-conditions" target="_blank">términos y condiciones</a>
+        </label>
+      </div>
+    </div>
+
+    <button class="register-button" @click="handleRegister" :disabled="isRegistering || !acceptTerms">
       {{ isRegistering ? 'Registrando...' : 'Registrarse' }}
     </button>
     <p class="login-prompt">
@@ -76,6 +85,7 @@ import auth from '@/auth';
 const router = useRouter();
 const error = ref('');
 const isRegistering = ref(false);
+const acceptTerms = ref(false);
 const userData = ref({
   firstName: '',
   lastName: '',
@@ -211,5 +221,22 @@ h1 {
 .login-prompt a {
   color: #0066cc;
   text-decoration: none;
+}
+.terms {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.terms input {
+  margin-right: 0.5rem;
+}
+.terms a {
+  color: #0066cc;
+  text-decoration: none;
+}
+.terms a:hover {
+  text-decoration: underline;
 }
 </style>
