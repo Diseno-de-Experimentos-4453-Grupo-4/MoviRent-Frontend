@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="mb-2">
-      <span class="font-bold">Cuenta bancaria del scooter:</span>
+      <span class="font-bold">Cuenta bancaria asociada al scooter:</span>
       <span class="ml-2">{{ scooter?.bankAccount }}</span>
     </div>
     <div class="mt-6 mb-2 font-bold">Imagen del baucher de la transacción</div>

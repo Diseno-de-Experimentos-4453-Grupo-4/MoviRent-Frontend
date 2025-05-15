@@ -20,6 +20,9 @@
       <button class="btn-primary" @click="aceptarReserva" :disabled="loading">
         {{ loading ? 'Aceptando...' : 'Aceptar reserva' }}
       </button>
+      <button class="btn-danger" @click="cancelarReserva" :disabled="loading">
+        {{ loading ? 'Cancelando...' : 'Cancelar transacción' }}
+      </button>
       <button class="btn-secondary" @click="goBack" :disabled="loading">Volver atrás</button>
     </div>
     <div v-if="error" class="text-red-600 mt-2">{{ error }}</div>
@@ -57,7 +60,8 @@ onMounted(async () => {
         hours: Math.ceil((new Date(filteredBooking.endDate) - new Date(filteredBooking.startDate)) / (1000 * 60 * 60)),
         userName: user.data.fullName,
         requestDate: new Date(filteredBooking.startDate).toLocaleString(),
-        baucherImage: filteredBooking.baucher
+        baucherImage: filteredBooking.baucher,
+        scooterId: filteredBooking.scooterId
       };
     } else {
       error.value = 'No se encontró la reserva solicitada.';
@@ -82,6 +86,33 @@ const aceptarReserva = async () => {
   } catch (err) {
     console.error('Error al aceptar la reserva:', err);
     error.value = 'Ocurrió un error al aceptar la reserva.';
+  } finally {
+    loading.value = false;
+  }
+};
+
+const cancelarReserva = async () => {
+  loading.value = true;
+  error.value = '';
+  success.value = false;
+  try {
+    await api.delete(`/Booking/${bookingId}`);
+    await api.put(`/Scooter/${booking.value.scooterId}`, {
+      is_available: 1,
+      brand: booking.value.scooterBrand,
+      model: booking.value.scooterModel,
+      image: booking.value.scooterImage,
+      street: booking.value.street || '',
+      neighborhood: booking.value.neighborhood || '',
+      city: booking.value.city || '',
+      district: booking.value.district || '',
+      bankAccount: booking.value.bankAccount || ''
+    });
+    success.value = true;
+    router.push('/estados-reserva');
+  } catch (err) {
+    console.error('Error al cancelar la reserva:', err);
+    error.value = 'Ocurrió un error al cancelar la reserva.';
   } finally {
     loading.value = false;
   }
@@ -125,6 +156,22 @@ const goBack = () => {
   border: none;
   cursor: pointer;
   width: 366px;
+}
+
+.btn-danger {
+  background: red;
+  color: #222;
+  font-weight: bold;
+  padding: 0.5rem 1.5rem;
+  margin-top: 1.5rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  width: 366px;
+}
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 .btn-primary:disabled,
 .btn-secondary:disabled {
