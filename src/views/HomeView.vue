@@ -56,13 +56,15 @@
       </div>
     </div>
 
-    <button class="history-button" @click="goToHistory">Ver Historial</button>
+    <div class="button-group">
+      <button class="edit-button" @click="goToEditProfile">Editar Perfil</button>
+      <button class="history-button" @click="goToHistory">Ver Historial</button>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import auth from '@/auth';
 import api from '@/api';
 import { getAuth } from 'firebase/auth';
 import { useRouter } from 'vue-router';
@@ -77,6 +79,11 @@ const profileStore = useProfileStore();
 const goToHistory = () => {
   router.push('/historial');
 };
+
+const goToEditProfile = () => {
+  router.push(`/editar-perfil/${profile.value.id}`);
+};
+
 onMounted(async () => {
   try {
     const auth = getAuth();
@@ -164,6 +171,29 @@ onMounted(async () => {
 .data-value {
   flex: 1;
 }
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.edit-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.edit-button:hover {
+  background-color: #218838;
+}
+
 .history-button {
   width: 100%;
   padding: 0.75rem;

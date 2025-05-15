@@ -109,7 +109,12 @@ const routes = [
     component: () => import('@/views/TwoFactorVerificationView.vue'),
     meta: { requiresGuest: true }
   },
-
+  {
+    path: '/editar-perfil/:profileId',
+    name: 'editar-perfil',
+    component: () => import('@/views/EditProfileView.vue'),
+    meta: { requiresAuth: true }
+  },
   {
     path: '/:pathMatch(.*)*',
     redirect: '/'

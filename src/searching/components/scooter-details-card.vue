@@ -36,6 +36,19 @@ const editScooter = () => {
   router.push(`/scooter/edit/${props.scooter.id}`);
 };
 
+const deleteScooter = async () => {
+  if (confirm('¿Estás seguro de que deseas eliminar este scooter?')) {
+    try {
+      await api.delete(`/Scooter/${props.scooter.id}`);
+      alert('Scooter eliminado correctamente.');
+      router.push('/mis-scooters');
+    } catch (error) {
+      console.error('Error al eliminar el scooter:', error);
+      alert('Ocurrió un error al intentar eliminar el scooter.');
+    }
+  }
+};
+
 onMounted(async () => {
   const auth = getAuth();
   const currentUser = auth.currentUser;
@@ -54,6 +67,14 @@ onMounted(async () => {
   <div class="details-container">
     <Card class="scooter-details-card">
       <template #content>
+        <div class="relative">
+          <Button
+            v-if="isOwner"
+            icon="pi pi-trash"
+            class="delete-button"
+            @click="deleteScooter"
+          />
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="flex flex-col items-center">
             <h2 class="text-xl font-bold mb-4">Detalle del scooter</h2>
@@ -152,5 +173,25 @@ onMounted(async () => {
 
 :deep(.p-button) {
   color: black;
+}
+
+.delete-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  background-color: darkred;
 }
 </style>
