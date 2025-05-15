@@ -44,19 +44,20 @@ const booking = ref(null);
 const loading = ref(false);
 const error = ref('');
 const success = ref(false);
+const scooter = ref(null);
 
 onMounted(async () => {
   try {
     const response = await api.get(`/Booking/own/state?profileId=${profileId}&statusId=2`);
     const filteredBooking = response.data.find(b => b.id === parseInt(bookingId));
     if (filteredBooking) {
-      const scooter = await api.get(`/Scooter/${filteredBooking.scooterId}`);
+      scooter.value = await api.get(`/Scooter/${filteredBooking.scooterId}`);
       const user = await api.get(`/Profile/${filteredBooking.profileId}`);
       booking.value = {
-        scooterBrand: scooter.data.brand,
-        scooterModel: scooter.data.model,
-        scooterImage: scooter.data.image,
-        price: scooter.data.price,
+        scooterBrand: scooter.value.data.brand,
+        scooterModel: scooter.value.data.model,
+        scooterImage: scooter.value.data.image,
+        price: scooter.value.data.price,
         hours: Math.ceil((new Date(filteredBooking.endDate) - new Date(filteredBooking.startDate)) / (1000 * 60 * 60)),
         userName: user.data.fullName,
         requestDate: new Date(filteredBooking.startDate).toLocaleString(),
@@ -97,16 +98,22 @@ const cancelarReserva = async () => {
   success.value = false;
   try {
     await api.delete(`/Booking/${bookingId}`);
+
+    const addressParts = scooter.value.data.address.split(',').map(part => part.trim());
+    const [street, neighborhood, city, district] = addressParts;
+
+
     await api.put(`/Scooter/${booking.value.scooterId}`, {
-      is_available: 1,
       brand: booking.value.scooterBrand,
       model: booking.value.scooterModel,
       image: booking.value.scooterImage,
-      street: booking.value.street || '',
-      neighborhood: booking.value.neighborhood || '',
-      city: booking.value.city || '',
-      district: booking.value.district || '',
-      bankAccount: booking.value.bankAccount || ''
+      street: street || '',
+      neighborhood: neighborhood || '',
+      city: city || '',
+      district: district || '',
+      bankAccount: scooter.value.data.bankAccount,
+      price: booking.value.price,
+      profileId: profileId
     });
     success.value = true;
     router.push('/estados-reserva');
