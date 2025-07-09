@@ -63,7 +63,7 @@
       <div class="input-group terms">
         <input type="checkbox" id="terms" v-model="acceptTerms">
         <label for="terms">
-          Acepto los <a href="/terms-and-conditions" target="_blank">términos y condiciones</a>
+          Acepto los <router-link to="/terms-and-conditions" target="_blank">términos y condiciones</router-link>
         </label>
       </div>
     </div>

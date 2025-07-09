@@ -41,12 +41,20 @@
 
           <div class="form-group">
             <label>Ciudad:</label>
-            <input v-model="form.City" placeholder="Ej: Lima" required>
+            <select v-model="form.City" required>
+              <option value="" disabled>Selecciona una ciudad</option>
+              <option value="Lima">Lima</option>
+            </select>
           </div>
 
           <div class="form-group">
             <label>Distrito:</label>
-            <input v-model="form.District" placeholder="Ej: San Isidro" required>
+            <select v-model="form.District" required>
+              <option value="" disabled>Selecciona un distrito</option>
+              <option v-for="district in districts" :key="district.id" :value="district.name">
+                {{ district.name }}
+              </option>
+            </select>
           </div>
 
           <div class="form-group">
@@ -89,6 +97,12 @@ const form = ref({
   ProfileId: null,
   BankAccount: ''
 });
+
+const districts = ref([
+  { id: 1, name: 'San Isidro' },
+  { id: 2, name: 'San Miguel' },
+  { id: 3, name: 'San Borja' },
+]);
 
 onMounted(async () => {
   try {
@@ -187,7 +201,7 @@ const cancelar = () => {
   font-size: 1.1rem;
 }
 
-.form-group input {
+.form-group input, .form-group select {
   padding: 12px 15px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -195,7 +209,7 @@ const cancelar = () => {
   transition: border-color 0.3s;
 }
 
-.form-group input:focus {
+.form-group input:focus, .form-group select:focus {
   border-color: #0066cc;
   outline: none;
 }

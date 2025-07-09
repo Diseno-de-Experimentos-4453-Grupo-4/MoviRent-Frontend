@@ -116,6 +116,11 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/terms-and-conditions',
+    name: 'terms-and-conditions',
+    component: () => import('@/views/TermsAndConditionsView.vue')
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/'
   }
@@ -152,3 +157,4 @@ router.beforeEach(async (to, from, next) => {
 });
 
 export default router;
+
