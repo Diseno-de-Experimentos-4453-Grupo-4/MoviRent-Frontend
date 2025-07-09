@@ -121,6 +121,12 @@ const routes = [
     component: () => import('@/views/TermsAndConditionsView.vue')
   },
   {
+    path: '/reports/:scooterId',
+    name: 'reports',
+    component: () => import('@/report/views/reports-view.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/'
   }
@@ -157,4 +163,3 @@ router.beforeEach(async (to, from, next) => {
 });
 
 export default router;
-

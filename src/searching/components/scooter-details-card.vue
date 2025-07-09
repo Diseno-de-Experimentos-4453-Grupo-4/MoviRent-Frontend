@@ -49,6 +49,10 @@ const deleteScooter = async () => {
   }
 };
 
+const goToReports = () => {
+  router.push(`/reports/${props.scooter.id}`);
+};
+
 onMounted(async () => {
   const auth = getAuth();
   const currentUser = auth.currentUser;
@@ -109,6 +113,18 @@ onMounted(async () => {
                 <label class="font-bold">Dirección:</label>
                 <div>{{ scooter.address }}</div>
               </div>
+              <div class="field mb-3">
+                <label class="font-bold">Puntaje del dueño:</label>
+                <div>
+                  <span v-if="scooter.ownerScore !== undefined && scooter.ownerScore !== null">
+                    <span v-for="n in 5" :key="n" style="color: #f59e0b; font-size: 1.2em;">
+                      <span v-if="n <= Math.round(scooter.ownerScore)">★</span><span v-else>☆</span>
+                    </span>
+                    <span class="ml-2 text-gray-600">({{ scooter.ownerScore.toFixed(1) }})</span>
+                  </span>
+                  <span v-else>Sin puntaje</span>
+                </div>
+              </div>
             </div>
 
             <div class="action-buttons flex gap-2 justify-center mt-4 w-full">
@@ -126,6 +142,7 @@ onMounted(async () => {
                 :loading="loading"
                 :disabled="loading"
               />
+              <Button label="Reportar incidente" class="p-button-danger" @click="goToReports" />
               <Button label="Regresar" @click="goBackToSearch" class="p-button-secondary" />
             </div>
           </div>

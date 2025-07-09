@@ -67,13 +67,24 @@ const vueRouter = useRouter()
 const profileStore = useProfileStore()
 
 onMounted(async () => {
-  profile.value = profileStore.getProfile()
-  const user = await api.get(`/Profile/${profile.value.email}`)
-  profile.value = {
-    ...user.data,
-    firstName: user.data.name?.firstName || user.data.fullName?.split(' ')[0] || '',
-    lastName: user.data.name?.lastName || user.data.fullName?.split(' ')[1] || ''
+  // Obtener perfil del usuario autenticado de manera segura
+  let userProfile = profileStore.getProfile();
+  if (!userProfile) {
+    // Si no está en el store, obtener desde Firebase y API
+    const { getAuth } = await import('firebase/auth');
+    const auth = getAuth();
+    if (auth.currentUser) {
+      const userEmail = auth.currentUser.email;
+      const user = await api.get(`/Profile/${userEmail}`);
+      userProfile = user.data;
+      profileStore.setProfile(userProfile);
+    }
   }
+  profile.value = {
+    ...userProfile,
+    firstName: userProfile?.name?.firstName || userProfile?.fullName?.split(' ')[0] || '',
+    lastName: userProfile?.name?.lastName || userProfile?.fullName?.split(' ')[1] || ''
+  };
   const scooterRes = await api.get(`/Scooter/${props.scooterId}`)
   scooter.value = scooterRes.data
   const ownerRes = await api.get(`/Profile/${scooter.value.profileId}`)
