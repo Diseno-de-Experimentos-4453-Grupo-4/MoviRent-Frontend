@@ -179,6 +179,19 @@ onMounted(async () => {
   min-width: 120px;
 }
 
+/* Responsive: botones en columna en móvil */
+@media (max-width: 640px) {
+  .action-buttons {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    align-items: stretch;
+  }
+  .action-buttons button {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
 .scooter-info {
   padding: 1rem;
 }
